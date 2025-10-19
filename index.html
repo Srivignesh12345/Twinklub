@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twinklub BOM - Bill of Materials</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tshirt"></i> Twinklub BOM System</h1>
+            <p>Bill of Materials - Garment Manufacturing</p>
+        </header>
+
+        <form id="bomForm" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+            <!-- Order Information Section -->
+            <div class="section">
+                <h2><i class="fas fa-clipboard-list"></i> Order Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderNumber">Order Number:</label>
+                        <input type="text" id="orderNumber" name="orderNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderType">Order Type:</label>
+                        <select id="orderType" name="orderType" required>
+                            <option value="">Select Type</option>
+                            <option value="organic polo">Organic Polo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fabric Section -->
+            <div class="section">
+                <h2><i class="fas fa-scroll"></i> Fabric</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fabricType">Fabric Type:</label>
+                        <input type="text" id="fabricType" name="fabricType" placeholder="Enter fabric type" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+                    <div class="form-group">
+                        <label for="fabricAmount">Amount:</label>
+                        <select id="fabricAmount" name="fabricAmount">
+                            <option value="">Select Amount</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.295">0.295</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fabricUnit">Unit:</label>
+                        <select id="fabricUnit" name="fabricUnit">
+                            <option value="">Select Unit</option>
+                            
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fabricPerGarment">Per Garment:</label>
+                        <select id="fabricPerGarment" name="fabricPerGarment">
+                            <option value="">Select Per Garment</option>
+                            
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fabricSupplier">Supplier:</label>
+                        <input type="text" id="fabricSupplier" name="fabricSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="fabricQty">Q.QTY:</label>
+                        <input type="number" id="fabricQty" name="fabricQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="fabricTotal">Amount (₹):</label>
+                        <input type="number" id="fabricTotal" name="fabricTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collar Yarn Section -->
+            <div class="section">
+                <h2><i class="fas fa-circle"></i> Collar Yarn</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="collarYarnType">Collar Yarn:</label>
+                        <input type="text" id="collarYarnType" name="collarYarnType" placeholder="Enter collar yarn type" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+                    <div class="form-group">
+                        <label for="collarYarnAmount">Amount:</label>
+                        <select id="collarYarnAmount" name="collarYarnAmount">
+                            <option value="">Select Amount</option>
+                            <option value="0.048">0.048</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.295">0.295</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarYarnUnit">Unit:</label>
+                        <select id="collarYarnUnit" name="collarYarnUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarYarnPerGarment">Per Garment:</label>
+                        <select id="collarYarnPerGarment" name="collarYarnPerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarYarnSupplier">Supplier:</label>
+                        <input type="text" id="collarYarnSupplier" name="collarYarnSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="collarYarnQty">Q.QTY:</label>
+                        <input type="number" id="collarYarnQty" name="collarYarnQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="collarYarnTotal">Amount (₹):</label>
+                        <input type="number" id="collarYarnTotal" name="collarYarnTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tipping Yarn Section -->
+            <div class="section">
+                <h2><i class="fas fa-circle"></i> Tipping Yarn</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tippingYarnType">Tipping Yarn:</label>
+                        <input type="text" id="tippingYarnType" name="tippingYarnType" placeholder="Enter tipping yarn type" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+                    <div class="form-group">
+                        <label for="tippingYarnAmount">Amount:</label>
+                        <select id="tippingYarnAmount" name="tippingYarnAmount">
+                            <option value="">Select Amount</option>
+                            <option value="0.005">0.005</option>
+                            <option value="0.048">0.048</option>
+                            
+                            <option value="0.1">0.1</option>
+                            <option value="0.295">0.295</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tippingYarnUnit">Unit:</label>
+                        <select id="tippingYarnUnit" name="tippingYarnUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tippingYarnPerGarment">Per Garment:</label>
+                        <select id="tippingYarnPerGarment" name="tippingYarnPerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tippingYarnSupplier">Supplier:</label>
+                        <input type="text" id="tippingYarnSupplier" name="tippingYarnSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="tippingYarnQty">Q.QTY:</label>
+                        <input type="number" id="tippingYarnQty" name="tippingYarnQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="tippingYarnTotal">Amount (₹):</label>
+                        <input type="number" id="tippingYarnTotal" name="tippingYarnTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collar Measurements Section -->
+            <div class="section">
+                <h2><i class="fas fa-ruler"></i> Collar Measurements</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="collarSize">Size:</label>
+                        <select id="collarSize" name="collarSize">
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="2XL">2XL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarDimensions">Length x Width:</label>
+                        <select id="collarDimensions" name="collarDimensions">
+                            <option>Select LXW (inches)</option>
+                            <option value="16.5 X 3.5"">16.5"X3.5"</option>
+                            <option value="17.5 X 3.5">17.5"X3.5"</option>
+                            <option value="18.5 X 3.5">18.5"X3.5"</option>
+                            <option value="19.5 X 3.5">19.5"X3.5"</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarUnit">Unit:</label>
+                        <select id="collarUnit" name="collarUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarPerGarment">Per Garment:</label>
+                        <select id="collarPerGarment" name="collarPerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="collarSupplier">Supplier:</label>
+                        <input type="text" id="collarSupplier" name="collarSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="collarQty">Q.QTY:</label>
+                        <input type="number" id="collarQty" name="collarQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="collarTotal">Amount (₹):</label>
+                        <input type="number" id="collarTotal" name="collarTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cuff Measurements Section -->
+            <div class="section">
+                <h2><i class="fas fa-ruler"></i> Cuff Measurements</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cuffSize">Size:</label>
+                        <select id="cuffSize" name="cuffSize">
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="2XL">2XL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuffDimensions">Length x Width:</label>
+                        <select id="cuffDimensions" name="cuffDimensions">
+                            <option>Select LXW (inches)</option>
+                            <option value="12.5\X1\">12.5"X1"</option>
+                            <option value="13\X1\">13"X1"</option>
+                            <option value="13.5\X1\">13.5"X1"</option>
+                            <option value="14.5\X1\">14.5"X1"</option>
+                            <option value="15.5\X1\">15.5"X1"</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuffUnit">Unit:</label>
+                        <select id="cuffUnit" name="cuffUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuffPerGarment">Per Garment:</label>
+                        <select id="cuffPerGarment" name="cuffPerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cuffSupplier">Supplier:</label>
+                        <input type="text" id="cuffSupplier" name="cuffSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="cuffQty">Q.QTY:</label>
+                        <input type="number" id="cuffQty" name="cuffQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="cuffTotal">Amount (₹):</label>
+                        <input type="number" id="cuffTotal" name="cuffTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons Section -->
+            <div class="section">
+                <h2><i class="fas fa-circle-dot"></i> Buttons</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="buttonMaterial">Mat. of Button:</label>
+                        <input type="text" id="buttonMaterial" name="buttonMaterial" placeholder="Enter button material">
+                    </div>
+                    <div class="form-group">
+                        <label for="buttonAmount">Amount:</label>
+                        <input type="number" id="buttonAmount" name="buttonAmount" step="0.001" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="buttonUnit">Unit:</label>
+                        <select id="buttonUnit" name="buttonUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="buttonPerGarment">Per Garment:</label>
+                        <select id="buttonPerGarment" name="buttonPerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="buttonSupplier">Supplier:</label>
+                        <input type="text" id="buttonSupplier" name="buttonSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="buttonQty">Q.QTY:</label>
+                        <input type="number" id="buttonQty" name="buttonQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="buttonTotal">Amount (₹):</label>
+                        <input type="number" id="buttonTotal" name="buttonTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Velvet Tapes Section -->
+            <div class="section">
+                <h2><i class="fas fa-tape"></i> Velvet Tapes</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="velvetTapeQuality">Velvet Tape:</label>
+                        <input type="text" id="velvetTapeQuality" name="velvetTapeQuality" placeholder="Enter velvet tape quality">
+                    </div>
+                    <div class="form-group">
+                        <label for="velvetTapeMeter">Meter:</label>
+                        <input type="number" id="velvetTapeMeter" name="velvetTapeMeter" step="0.001" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="velvetTapeUnit">Unit:</label>
+                        <select id="velvetTapeUnit" name="velvetTapeUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="velvetTapePerGarment">Per Garment:</label>
+                        <select id="velvetTapePerGarment" name="velvetTapePerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="velvetTapeSupplier">Supplier:</label>
+                        <input type="text" id="velvetTapeSupplier" name="velvetTapeSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="velvetTapeQty">Q.QTY:</label>
+                        <input type="number" id="velvetTapeQty" name="velvetTapeQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="velvetTapeTotal">Amount (₹):</label>
+                        <input type="number" id="velvetTapeTotal" name="velvetTapeTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wash Care Labels Section -->
+            <div class="section">
+                <h2><i class="fas fa-tag"></i> Wash Care Labels</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="washCareQuality">Wash Care Labels:</label>
+                        <input type="text" id="washCareQuality" name="washCareQuality" placeholder="Enter wash care label quality">
+                    </div>
+                    <div class="form-group">
+                        <label for="washCareAmount">Amount:</label>
+                        <input type="number" id="washCareAmount" name="washCareAmount" step="0.001" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="washCareUnit">Unit:</label>
+                        <select id="washCareUnit" name="washCareUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="washCarePerGarment">Per Garment:</label>
+                        <select id="washCarePerGarment" name="washCarePerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="washCareSupplier">Supplier:</label>
+                        <input type="text" id="washCareSupplier" name="washCareSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="washCareQty">Q.QTY:</label>
+                        <input type="number" id="washCareQty" name="washCareQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="washCareTotal">Amount (₹):</label>
+                        <input type="number" id="washCareTotal" name="washCareTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Woven Size Labels Section -->
+            <div class="section">
+                <h2><i class="fas fa-tag"></i> Woven Size Labels</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="wovenSizeLabel">Size:</label>
+                        <select id="wovenSizeLabel" name="wovenSizeLabel">
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="2XL">2XL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wovenSizeAmount">Amount:</label>
+                        <input type="number" id="wovenSizeAmount" name="wovenSizeAmount" step="0.001" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="wovenSizeUnit">Unit:</label>
+                        <select id="wovenSizeUnit" name="wovenSizeUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wovenSizePerGarment">Per Garment:</label>
+                        <select id="wovenSizePerGarment" name="wovenSizePerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wovenSizeSupplier">Supplier:</label>
+                        <input type="text" id="wovenSizeSupplier" name="wovenSizeSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="wovenSizeQty">Q.QTY:</label>
+                        <input type="number" id="wovenSizeQty" name="wovenSizeQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="wovenSizeTotal">Amount (₹):</label>
+                        <input type="number" id="wovenSizeTotal" name="wovenSizeTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polybags Section -->
+            <div class="section">
+                <h2><i class="fas fa-box"></i> Polybags</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="polybagQuality">Quality:</label>
+                        <input type="text" id="polybagQuality" name="polybagQuality" placeholder="Enter polybag quality">
+                    </div>
+                    <div class="form-group">
+                        <label for="polybagSize">Size (L x W):</label>
+                        <input type="text" id="polybagSize" name="polybagSize" placeholder="e.g., 12x8 inches">
+                    </div>
+                    <div class="form-group">
+                        <label for="polybagUnit">Unit:</label>
+                        <select id="polybagUnit" name="polybagUnit">
+                            <option value="">Select Unit</option>
+                            <option value="KGS">KGS</option>
+                            <option value="LXW INCHES">LXW INCHES</option>
+                            <option value="NOS">NOS</option>
+                            <option value="METERS">METERS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="polybagPerGarment">Per Garment:</label>
+                        <select id="polybagPerGarment" name="polybagPerGarment">
+                            <option value="">Select Per Garment</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.75">0.75</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="polybagSupplier">Supplier:</label>
+                        <input type="text" id="polybagSupplier" name="polybagSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="polybagQty">Q.QTY:</label>
+                        <input type="number" id="polybagQty" name="polybagQty" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="polybagTotal">Amount (₹):</label>
+                        <input type="number" id="polybagTotal" name="polybagTotal" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Summary -->
+            <div class="section total-section">
+                <h2><i class="fas fa-calculator"></i> Total Summary</h2>
+                <div class="total-display">
+                    <div class="total-item">
+                        <span>Total Amount:</span>
+                        <span id="grandTotal">&#8377;0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" id="exportExcelBtn" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
+                <button type="button" id="exportPDFBtn" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Export to PDF
+                </button>
+                <button type="button" id="exportWordBtn" class="btn btn-info">
+                    <i class="fas fa-file-alt"></i> Export to TXT
+                </button>
+                <button type="button" id="clearBtn" class="btn btn-warning">
+                    <i class="fas fa-eraser"></i> Clear Form
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.2.3/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
