@@ -63,6 +63,61 @@ function collectFormData() {
 
 // ================= CSV / EXCEL =================
 function exportToExcel() {
+    /* ================= LOADING BOX ================= */
+
+function showLoadingBox(message = 'Preparing export...') {
+    // Remove existing box if any
+    hideLoadingBox();
+
+    const box = document.createElement('div');
+    box.id = 'exportLoadingBox';
+    box.style.position = 'fixed';
+    box.style.top = '50%';
+    box.style.left = '50%';
+    box.style.transform = 'translate(-50%, -50%)';
+    box.style.background = '#ffffff';
+    box.style.padding = '16px 22px';
+    box.style.borderRadius = '10px';
+    box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+    box.style.zIndex = '9999';
+    box.style.display = 'flex';
+    box.style.alignItems = 'center';
+    box.style.gap = '12px';
+    box.style.fontFamily = 'Arial, sans-serif';
+    box.style.fontSize = '14px';
+
+    box.innerHTML = `
+        <div style="
+            width:20px;
+            height:20px;
+            border:3px solid #ddd;
+            border-top:3px solid #3498db;
+            border-radius:50%;
+            animation: spin 1s linear infinite;
+        "></div>
+        <span>${message}</span>
+    `;
+
+    document.body.appendChild(box);
+
+    // Spinner animation
+    if (!document.getElementById('loadingSpinnerStyle')) {
+        const style = document.createElement('style');
+        style.id = 'loadingSpinnerStyle';
+        style.innerHTML = `
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function hideLoadingBox() {
+    const box = document.getElementById('exportLoadingBox');
+    if (box) box.remove();
+}
+
     const data = collectFormData();
 
     const rows = [
@@ -97,6 +152,61 @@ function exportToExcel() {
 
 // ================= PDF =================
 function exportToPDF() {
+    /* ================= LOADING BOX ================= */
+
+function showLoadingBox(message = 'Preparing export...') {
+    // Remove existing box if any
+    hideLoadingBox();
+
+    const box = document.createElement('div');
+    box.id = 'exportLoadingBox';
+    box.style.position = 'fixed';
+    box.style.top = '50%';
+    box.style.left = '50%';
+    box.style.transform = 'translate(-50%, -50%)';
+    box.style.background = '#ffffff';
+    box.style.padding = '16px 22px';
+    box.style.borderRadius = '10px';
+    box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+    box.style.zIndex = '9999';
+    box.style.display = 'flex';
+    box.style.alignItems = 'center';
+    box.style.gap = '12px';
+    box.style.fontFamily = 'Arial, sans-serif';
+    box.style.fontSize = '14px';
+
+    box.innerHTML = `
+        <div style="
+            width:20px;
+            height:20px;
+            border:3px solid #ddd;
+            border-top:3px solid #3498db;
+            border-radius:50%;
+            animation: spin 1s linear infinite;
+        "></div>
+        <span>${message}</span>
+    `;
+
+    document.body.appendChild(box);
+
+    // Spinner animation
+    if (!document.getElementById('loadingSpinnerStyle')) {
+        const style = document.createElement('style');
+        style.id = 'loadingSpinnerStyle';
+        style.innerHTML = `
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function hideLoadingBox() {
+    const box = document.getElementById('exportLoadingBox');
+    if (box) box.remove();
+}
+
     showLoadingBox('Preparing PDF file...');
 
     setTimeout(() => {
@@ -179,6 +289,61 @@ function exportToPDF() {
 
 // ================= WORD =================
 function exportToWord() {
+    /* ================= LOADING BOX ================= */
+
+function showLoadingBox(message = 'Preparing export...') {
+    // Remove existing box if any
+    hideLoadingBox();
+
+    const box = document.createElement('div');
+    box.id = 'exportLoadingBox';
+    box.style.position = 'fixed';
+    box.style.top = '50%';
+    box.style.left = '50%';
+    box.style.transform = 'translate(-50%, -50%)';
+    box.style.background = '#ffffff';
+    box.style.padding = '16px 22px';
+    box.style.borderRadius = '10px';
+    box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+    box.style.zIndex = '9999';
+    box.style.display = 'flex';
+    box.style.alignItems = 'center';
+    box.style.gap = '12px';
+    box.style.fontFamily = 'Arial, sans-serif';
+    box.style.fontSize = '14px';
+
+    box.innerHTML = `
+        <div style="
+            width:20px;
+            height:20px;
+            border:3px solid #ddd;
+            border-top:3px solid #3498db;
+            border-radius:50%;
+            animation: spin 1s linear infinite;
+        "></div>
+        <span>${message}</span>
+    `;
+
+    document.body.appendChild(box);
+
+    // Spinner animation
+    if (!document.getElementById('loadingSpinnerStyle')) {
+        const style = document.createElement('style');
+        style.id = 'loadingSpinnerStyle';
+        style.innerHTML = `
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function hideLoadingBox() {
+    const box = document.getElementById('exportLoadingBox');
+    if (box) box.remove();
+}
+
     const data = collectFormData();
 
     if (!window.docx) {
