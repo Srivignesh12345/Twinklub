@@ -97,22 +97,84 @@ function exportToExcel() {
 
 // ================= PDF =================
 function exportToPDF() {
-    const data = collectFormData();
+    showLoadingBox('Preparing PDF file...');
 
-    if (!window.jspdf) {
-        downloadFile(createTextContent(data), 'txt', 'Twinklub_BOM.txt');
-        return;
-    }
+    setTimeout(() => {
+        const data = collectFormData();
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            downloadFile(createTextContent(data), 'txt', 'Twinklub_BOM.txt');
+            hideLoadingBox();
+            return;
+        }
 
-    doc.text('Twinklub BOM - Bill of Materials', 20, 20);
-    doc.text(`Consumption: ${data.fabricConsumption} ${data.fabricUnit}`, 20, 40);
-    doc.text(`Q.QTY: ${data.fabricQty}`, 20, 50);
-    doc.text(`Total: ${data.grandTotal}`, 20, 60);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    doc.save('Twinklub_BOM.pdf');
+        /* ================= TITLE ================= */
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('Twinklub BOM - Bill of Materials', 105, 20, { align: 'center' });
+
+        /* ================= ORDER INFO ================= */
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Order Number : ${data.orderNumber || '-'}`, 20, 35);
+        doc.text(`Order Type      : ${data.orderType || '-'}`, 20, 42);
+
+        /* ================= TABLE ================= */
+        doc.autoTable({
+            startY: 55,
+            theme: 'grid',
+            head: [[
+                'Section',
+                'Details',
+                'Consumption',
+                'Unit',
+                'Supplier',
+                'Q.QTY',
+                'Total (Rs)'
+            ]],
+            body: [[
+                'Fabric',
+                data.fabricType || '-',
+                data.fabricConsumption || '-',
+                data.fabricUnit || '-',
+                data.fabricSupplier || '-',
+                data.fabricQty || '-',
+                data.fabricTotal || '0.00'
+            ]],
+            styles: {
+                fontSize: 10,
+                cellPadding: 4,
+                halign: 'center',
+                valign: 'middle'
+            },
+            headStyles: {
+                fillColor: [52, 152, 219],
+                textColor: 255,
+                halign: 'center'
+            },
+            columnStyles: {
+                0: { halign: 'left' },
+                1: { halign: 'left' }
+            }
+        });
+
+        /* ================= GRAND TOTAL ================= */
+        const finalY = doc.lastAutoTable.finalY + 12;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(
+            `GRAND TOTAL : Rs ${String(data.grandTotal).replace(/[^\d.]/g, '')}/-`,
+            105,
+            finalY,
+            { align: 'center' }
+        );
+
+        doc.save('Twinklub_BOM.pdf');
+        hideLoadingBox();
+    }, 600);
 }
 
 // ================= WORD =================
