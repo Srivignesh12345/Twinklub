@@ -756,3 +756,78 @@ html {
         padding: 20px;
     }
 } 
+input, select {
+    width: 100%;
+}
+
+/* Small outline button variant (used for + Add buttons) */
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #3498db;
+    border: 2px dashed rgba(52, 152, 219, 0.65);
+    box-shadow: none;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background: linear-gradient(90deg, rgba(52,152,219,0.06), rgba(52,152,219,0.02));
+    color: #1f6fa8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(52,152,219,0.08);
+}
+
+/* Specific styles for Add Another Collar/Cuff buttons */
+.add-collar-btn,
+.add-cuff-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px dashed #3498db;
+    background: rgba(52,152,219,0.03);
+    color: #2c6fa6;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.18s ease-in-out;
+    margin-top: 10px;
+}
+
+.add-collar-btn i,
+.add-cuff-btn i {
+    font-size: 14px;
+}
+
+.add-collar-btn:hover,
+.add-cuff-btn:hover {
+    background: linear-gradient(90deg, rgba(52,152,219,0.08), rgba(52,152,219,0.04));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(52,152,219,0.08);
+}
+
+/* Make add buttons full-width on narrow screens for easier tapping */
+@media (max-width: 480px) {
+    .add-collar-btn,
+    .add-cuff-btn,
+    .btn-outline-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Center the add-row container within form rows */
+.add-row {
+    margin-top: 8px;
+}
+.add-row .add-btn-container {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
