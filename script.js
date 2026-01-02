@@ -14,6 +14,19 @@ const currencyRates = {
     CAD: 0.016
 };
 
+// Currency symbols for display
+const currencySymbols = {
+    INR: '₹',
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    BDT: '৳',
+    CNY: '¥',
+    JPY: '¥',
+    AUD: '$',
+    CAD: '$'
+};
+
 
     function formatRs(value) {
         const num = parseFloat(String(value).replace(/[^0-9.]/g, ''));
@@ -32,17 +45,25 @@ const currencyRates = {
     const base = parseFloat(String(inrValue).replace(/[^0-9.]/g, '')) || 0;
     const converted = base * rate;
 
-    if (currency === 'INR') {
-        return `Rs ${converted.toFixed(2)}/-`;
-    }
+        const symbol = currencySymbols[currency] || currency;
+        // For INR previously used Rs .../-, keep concise symbol-based formatting
+        return `${symbol}${converted.toFixed(2)}`;
+}
 
-    return `${currency} ${converted.toFixed(2)}`;
+// Update all visible currency symbol spans to match selected currency
+function updateCurrencySymbols() {
+    const currency = document.getElementById('currency')?.value || 'INR';
+    const symbol = currencySymbols[currency] || currency;
+    document.querySelectorAll('.currency-symbol').forEach(el => {
+        el.textContent = symbol;
+    });
 }
 
     // DOM Content Loaded
     document.addEventListener('DOMContentLoaded', function() {
         initializeForm();
         setupEventListeners();
+        updateCurrencySymbols();
         setupCalculationListeners();
         setupTheme();
         setupScrollAnimations();
@@ -68,7 +89,10 @@ const currencyRates = {
             // Currency change → recalculate totals
     const currencySelect = document.getElementById('currency');
     if (currencySelect) {
-        currencySelect.addEventListener('change', calculateAllTotals);
+        currencySelect.addEventListener('change', function() {
+            updateCurrencySymbols();
+            calculateAllTotals();
+        });
     }
 
         
@@ -82,6 +106,9 @@ const currencyRates = {
         } else {
             console.error('Excel button not found!');
         }
+        
+        
+        
         if (clearBtn) {
             clearBtn.addEventListener('click', clearForm);
             console.log('Clear button listener added');
@@ -161,6 +188,18 @@ const currencyRates = {
         } catch (err) {
             console.error('Error setting up theme:', err);
         }
+
+        document.addEventListener('input', function (e) {
+    if (
+        e.target.classList.contains('collarPerGarment') ||
+        e.target.classList.contains('collarQty') ||
+        e.target.classList.contains('cuffPerGarment') ||
+        e.target.classList.contains('cuffQty')
+    ) {
+        calculateAllTotals();
+    }
+});
+
     }
 
     function applyTheme(theme) {
@@ -185,10 +224,57 @@ const currencyRates = {
         
         const totalField = document.getElementById(totalId);
         if (totalField) {
-            totalField.value = total.toFixed(2);
+            // store raw INR value for exports and calculations
+            totalField.dataset.inr = String(Number((total || 0).toFixed(2)));
+            // display converted value according to selected currency
+            totalField.value = formatCurrency(total);
         }
         return total;
     }
+
+    function calculateMultipleCollars() {
+    let total = 0;
+
+    document.querySelectorAll('.collar-block').forEach(block => {
+        const perGarment = parseFloat(block.querySelector('.collarPerGarment')?.value || 0);
+        const qty = parseFloat(block.querySelector('.collarQty')?.value || 0);
+
+        const amount = perGarment * qty;
+
+        const totalField = block.querySelector('.collarTotal');
+        if (totalField) {
+            totalField.dataset.inr = String(Number((amount || 0).toFixed(2)));
+            totalField.value = formatCurrency(amount);
+        }
+
+        total += amount;
+    });
+
+    return total;
+}
+
+function calculateMultipleCuffs() {
+    let total = 0;
+
+    document.querySelectorAll('.cuff-block').forEach(block => {
+        const perGarment = parseFloat(block.querySelector('.cuffPerGarment')?.value || 0);
+        const qty = parseFloat(block.querySelector('.cuffQty')?.value || 0);
+
+        const amount = perGarment * qty;
+
+        const totalField = block.querySelector('.cuffTotal');
+        if (totalField) {
+            totalField.dataset.inr = String(Number((amount || 0).toFixed(2)));
+            totalField.value = formatCurrency(amount);
+        }
+
+        total += amount;
+    });
+
+    return total;
+}
+
+
 
     // Calculate all totals
     function calculateAllTotals() {
@@ -206,10 +292,13 @@ const currencyRates = {
         grandTotal += calculateSectionTotal('tippingYarnAmount', 'tippingYarnPerGarment', 'tippingYarnQty', 'tippingYarnTotal');
         
         // Collar (only per garment * qty)
-        grandTotal += calculateSectionTotal('', 'collarPerGarment', 'collarQty', 'collarTotal');
+        // Multiple Collar Measurements
+            grandTotal += calculateMultipleCollars();
+
+
         
-        // Cuff (only per garment * qty)
-        grandTotal += calculateSectionTotal('', 'cuffPerGarment', 'cuffQty', 'cuffTotal');
+        // Multiple Cuff Measurements
+        grandTotal += calculateMultipleCuffs();
         
         // Buttons: compute as perGarment * qty only (ignore amount)
         grandTotal += calculateSectionTotal('', 'buttonPerGarment', 'buttonQty', 'buttonTotal');
@@ -231,6 +320,40 @@ const currencyRates = {
     
         return grandTotal;
     }
+    function addCollarBlock() {
+    const container = document.getElementById('collarBlocks');
+    if (!container) return;
+
+    const firstBlock = container.querySelector('.collar-block');
+    if (!firstBlock) return;
+
+    const clone = firstBlock.cloneNode(true);
+
+    clone.querySelectorAll('input, select').forEach(el => {
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+    });
+
+    container.appendChild(clone);
+}
+
+function addCuffBlock() {
+    const container = document.getElementById('cuffBlocks');
+    if (!container) return;
+
+    const firstBlock = container.querySelector('.cuff-block');
+    if (!firstBlock) return;
+
+    const clone = firstBlock.cloneNode(true);
+
+    clone.querySelectorAll('input, select').forEach(el => {
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+    });
+
+    container.appendChild(clone);
+}
+
 
     // Collect form data
     function collectFormData() {
@@ -238,9 +361,61 @@ const currencyRates = {
         const formData = new FormData(form);
         const data = {};
         
-        for (let [key, value] of formData.entries()) {
-            data[key] = value;
-        }
+        // ===== COLLECT MULTIPLE COLLARS =====
+        data.collars = [];
+
+    document.querySelectorAll('.collar-block').forEach(block => {
+        const totalEl = block.querySelector('.collarTotal');
+        const collar = {
+            size: block.querySelector('.collarSize')?.value || '',
+            dimensions: block.querySelector('.collarDimensions')?.value || '',
+            unit: block.querySelector('.collarUnit')?.value || '',
+            perGarment: block.querySelector('.collarPerGarment')?.value || '',
+            supplier: block.querySelector('.collarSupplier')?.value || '',
+            qty: block.querySelector('.collarQty')?.value || '',
+            // raw INR value
+            total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+        };
+
+        const anyFilled = [collar.size, collar.dimensions, collar.unit, collar.perGarment, collar.supplier, collar.qty, collar.total].some(v => String(v).trim() !== '');
+        if (anyFilled) data.collars.push(collar);
+    });
+
+        // ===== COLLECT MULTIPLE CUFFS =====
+data.cuffs = [];
+
+document.querySelectorAll('.cuff-block').forEach(block => {
+    const totalEl = block.querySelector('.cuffTotal');
+    const cuff = {
+        size: block.querySelector('.cuffSize')?.value || '',
+        dimensions: block.querySelector('.cuffDimensions')?.value || '',
+        unit: block.querySelector('.cuffUnit')?.value || '',
+        perGarment: block.querySelector('.cuffPerGarment')?.value || '',
+        supplier: block.querySelector('.cuffSupplier')?.value || '',
+        qty: block.querySelector('.cuffQty')?.value || '',
+        total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+    };
+
+    const anyFilled = [cuff.size, cuff.dimensions, cuff.unit, cuff.perGarment, cuff.supplier, cuff.qty, cuff.total].some(v => String(v).trim() !== '');
+    if (anyFilled) data.cuffs.push(cuff);
+});
+
+// If there are no dynamic cuff-blocks, fall back to single cuff fields (existing HTML)
+if (data.cuffs.length === 0) {
+    const cuffTotalEl = document.getElementById('cuffTotal');
+    const singleCuff = {
+        size: getVal('cuffSize'),
+        dimensions: getVal('cuffDimensions'),
+        unit: getVal('cuffUnit'),
+        perGarment: getVal('cuffPerGarment'),
+        supplier: getVal('cuffSupplier'),
+        qty: getVal('cuffQty'),
+        total: cuffTotalEl && cuffTotalEl.dataset && cuffTotalEl.dataset.inr ? parseFloat(cuffTotalEl.dataset.inr) : (parseFloat(String(getVal('cuffTotal')||'').replace(/[^0-9.]/g,'')) || 0)
+    };
+    const anyFilled = [singleCuff.size, singleCuff.dimensions, singleCuff.unit, singleCuff.perGarment, singleCuff.supplier, singleCuff.qty, singleCuff.total].some(v => String(v).trim() !== '');
+    if (anyFilled) data.cuffs.push(singleCuff);
+}
+
         
         // Safe getter for optional inputs
         const getVal = (id) => {
@@ -248,25 +423,97 @@ const currencyRates = {
             return el ? el.value : '';
         };
 
-        // ✅ ADD THESE TWO LINES (Order Dates)
+        // Order Information
         data.orderDate = getVal('orderDate');
-
+        data.expectedDeliveryDate = getVal('expectedDeliveryDate');
+        data.orderNumber = getVal('orderNumber');
+        data.orderType = getVal('orderType');
         data.currency = getVal('currency') || 'INR';
 
-        data.expectedDeliveryDate = getVal('expectedDeliveryDate');
+        // Fabric Section
+        data.fabricType = getVal('fabricType');
+        data.fabricAmount = getVal('fabricAmount');
+        data.fabricUnit = getVal('fabricUnit');
+        data.fabricPerGarment = getVal('fabricPerGarment');
+        data.fabricSupplier = getVal('fabricSupplier');
+        data.fabricQty = getVal('fabricQty');
+
+        // Collar Yarn Section
+        data.collarYarnType = getVal('collarYarnType');
+        data.collarYarnAmount = getVal('collarYarnAmount');
+        data.collarYarnUnit = getVal('collarYarnUnit');
+        data.collarYarnPerGarment = getVal('collarYarnPerGarment');
+        data.collarYarnSupplier = getVal('collarYarnSupplier');
+        data.collarYarnQty = getVal('collarYarnQty');
+
+        // Tipping Yarn Section
+        data.tippingYarnType = getVal('tippingYarnType');
+        data.tippingYarnAmount = getVal('tippingYarnAmount');
+        data.tippingYarnUnit = getVal('tippingYarnUnit');
+        data.tippingYarnPerGarment = getVal('tippingYarnPerGarment');
+        data.tippingYarnSupplier = getVal('tippingYarnSupplier');
+        data.tippingYarnQty = getVal('tippingYarnQty');
+
+        // Buttons Section
+        data.buttonMaterial = getVal('buttonMaterial');
+        data.buttonAmount = getVal('buttonAmount');
+        data.buttonUnit = getVal('buttonUnit');
+        data.buttonPerGarment = getVal('buttonPerGarment');
+        data.buttonSupplier = getVal('buttonSupplier');
+        data.buttonQty = getVal('buttonQty');
+
+        // Velvet Tapes Section
+        data.velvetTapeQuality = getVal('velvetTapeQuality');
+        data.velvetTapeMeter = getVal('velvetTapeMeter');
+        data.velvetTapeUnit = getVal('velvetTapeUnit');
+        data.velvetTapePerGarment = getVal('velvetTapePerGarment');
+        data.velvetTapeSupplier = getVal('velvetTapeSupplier');
+        data.velvetTapeQty = getVal('velvetTapeQty');
+
+        // Wash Care Labels Section
+        data.washCareQuality = getVal('washCareQuality');
+        data.washCareAmount = getVal('washCareAmount');
+        data.washCareUnit = getVal('washCareUnit');
+        data.washCarePerGarment = getVal('washCarePerGarment');
+        data.washCareSupplier = getVal('washCareSupplier');
+        data.washCareQty = getVal('washCareQty');
+
+        // Woven Size Labels Section
+        data.wovenSizeLabel = getVal('wovenSizeLabel');
+        data.wovenSizeAmount = getVal('wovenSizeAmount');
+        data.wovenSizeUnit = getVal('wovenSizeUnit');
+        data.wovenSizePerGarment = getVal('wovenSizePerGarment');
+        data.wovenSizeSupplier = getVal('wovenSizeSupplier');
+        data.wovenSizeQty = getVal('wovenSizeQty');
+
+        // Polybags Section
+        data.polybagQuality = getVal('polybagQuality');
+        data.polybagSize = getVal('polybagSize');
+        data.polybagUnit = getVal('polybagUnit');
+        data.polybagPerGarment = getVal('polybagPerGarment');
+        data.polybagSupplier = getVal('polybagSupplier');
+        data.polybagQty = getVal('polybagQty');
         
-        // Add calculated totals
-        data.fabricTotal = getVal('fabricTotal');
-        data.collarYarnTotal = getVal('collarYarnTotal');
-        data.tippingYarnTotal = getVal('tippingYarnTotal');
-        data.collarTotal = getVal('collarTotal');
-        data.cuffTotal = getVal('cuffTotal');
-        data.buttonTotal = getVal('buttonTotal');
-        data.velvetTapeTotal = getVal('velvetTapeTotal');
-        data.washCareTotal = getVal('washCareTotal');
-        data.wovenSizeTotal = getVal('wovenSizeTotal');
-        data.polybagTotal = getVal('polybagTotal');
-        data.grandTotal = document.getElementById('grandTotal').textContent;
+        // Add calculated totals (raw INR values read from data-inr when available)
+        const getNumericTotal = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return 0;
+            if (el.dataset && el.dataset.inr) return parseFloat(el.dataset.inr) || 0;
+            const raw = parseFloat(String(el.value || el.textContent || '').replace(/[^0-9.]/g,''));
+            return isNaN(raw) ? 0 : raw;
+        };
+
+        data.fabricTotal = getNumericTotal('fabricTotal');
+        data.collarYarnTotal = getNumericTotal('collarYarnTotal');
+        data.tippingYarnTotal = getNumericTotal('tippingYarnTotal');
+        data.collarTotal = getNumericTotal('collarTotal');
+        data.cuffTotal = getNumericTotal('cuffTotal');
+        data.buttonTotal = getNumericTotal('buttonTotal');
+        data.velvetTapeTotal = getNumericTotal('velvetTapeTotal');
+        data.washCareTotal = getNumericTotal('washCareTotal');
+        data.wovenSizeTotal = getNumericTotal('wovenSizeTotal');
+        data.polybagTotal = getNumericTotal('polybagTotal');
+        data.grandTotal = calculateAllTotals();
         
         return data;
     }
@@ -370,30 +617,33 @@ const currencyRates = {
         rows.push(['Order Type:', data.orderType || '']);
                 rows.push(['']);
         rows.push(['Section', 'Details', 'Amount', 'Unit', 'Per Garment', 'Supplier', 'Q.QTY', 'Total']);
-        rows.push(['Fabric 1', data.fabricType || '', data.fabricAmount || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', data.fabricTotal || '']);
-        rows.push(['Collar Yarn', data.collarYarnType || '', data.collarYarnAmount || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', data.collarYarnTotal || '']);
-        rows.push(['Tipping Yarn', data.tippingYarnType || '', data.tippingYarnAmount || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', data.tippingYarnTotal || '']);
-        
-        // Add collar measurements if quantity > 0
-        const collarQty = parseFloat(data.collarQty || '');
-        if (!isNaN(collarQty) && collarQty > 0) {
-            const collarDetails = `${data.collarSize || ''}${data.collarDimensions ? ' - ' + data.collarDimensions : ''}`;
-            rows.push(['Collar Measurements', collarDetails, '', data.collarUnit || '', data.collarPerGarment || '', data.collarSupplier || '', data.collarQty || '', data.collarTotal || '']);
+        rows.push(['Fabric 1', data.fabricType || '', data.fabricAmount || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', formatCurrency(data.fabricTotal || 0)]);
+        rows.push(['Collar Yarn', data.collarYarnType || '', data.collarYarnAmount || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', formatCurrency(data.collarYarnTotal || 0)]);
+        rows.push(['Tipping Yarn', data.tippingYarnType || '', data.tippingYarnAmount || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', formatCurrency(data.tippingYarnTotal || 0)]);
+
+        // Add collar measurements (multiple) with numbering
+        if (Array.isArray(data.collars) && data.collars.length > 0) {
+            data.collars.forEach((c, idx) => {
+                const details = `${c.size || ''}${c.dimensions ? ' - ' + c.dimensions : ''}`;
+                rows.push([`Collar Measurements-${idx + 1}`, details, '', c.unit || '', c.perGarment || '', c.supplier || '', c.qty || '', formatCurrency(c.total || 0)]);
+            });
+        }
+
+        // Add cuff measurements (multiple) with numbering
+        if (Array.isArray(data.cuffs) && data.cuffs.length > 0) {
+            data.cuffs.forEach((c, idx) => {
+                const details = `${c.size || ''}${c.dimensions ? ' - ' + c.dimensions : ''}`;
+                rows.push([`Cuff Measurements-${idx + 1}`, details, '', c.unit || '', c.perGarment || '', c.supplier || '', c.qty || '', formatCurrency(c.total || 0)]);
+            });
         }
         
-        // Add cuff measurements if quantity > 0
-        const cuffQty = parseFloat(data.cuffQty || '');
-        if (!isNaN(cuffQty) && cuffQty > 0) {
-            const cuffDetails = `${data.cuffSize || ''}${data.cuffDimensions ? ' - ' + data.cuffDimensions : ''}`;
-            rows.push(['Cuff Measurements', cuffDetails, '', data.cuffUnit || '', data.cuffPerGarment || '', data.cuffSupplier || '', data.cuffQty || '', data.cuffTotal || '']);
-        }
-        
-        rows.push(['Buttons', data.buttonMaterial || '', data.buttonAmount || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', data.buttonTotal || '']);
-        rows.push(['Velvet Tapes', data.velvetTapeQuality || '', data.velvetTapeMeter || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', data.velvetTapeTotal || '']);
-        rows.push(['Wash Care Labels', data.washCareQuality || '', data.washCareAmount || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', data.washCareTotal || '']);
-        rows.push(['Polybags', data.polybagQuality || '', data.polybagSize || '', data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', data.polybagTotal || '']);
+        rows.push(['Buttons', data.buttonMaterial || '', data.buttonAmount || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', formatCurrency(data.buttonTotal || 0)]);
+        rows.push(['Velvet Tapes', data.velvetTapeQuality || '', data.velvetTapeMeter || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', formatCurrency(data.velvetTapeTotal || 0)]);
+        rows.push(['Wash Care Labels', data.washCareQuality || '', data.washCareAmount || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', formatCurrency(data.washCareTotal || 0)]);
+        rows.push(['Polybags', data.polybagQuality || '', data.polybagSize || '', data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', formatCurrency(data.polybagTotal || 0)]);
         rows.push(['']);
-        rows.push(['GRAND TOTAL:', data.grandTotal || 'Rs 0.00/-']);
+        // Ensure grand total uses current currency symbol
+        rows.push(['GRAND TOTAL:', formatCurrency(parseFloat(String(data.grandTotal).replace(/[^0-9.]/g, '')) || calculateAllTotals())]);
         
         return rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
     }
@@ -433,52 +683,61 @@ const currencyRates = {
     Per Garment: ${data.fabricPerGarment || ''}
     Supplier: ${data.fabricSupplier || ''}
     Q.QTY: ${data.fabricQty || ''}
-    Total: ${data.fabricTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.fabricTotal || 0)}
 
     Collar Yarn: ${data.collarYarnType || ''}
     Amount: ${data.collarYarnAmount || ''} ${data.collarYarnUnit || ''}
     Per Garment: ${data.collarYarnPerGarment || ''}
     Supplier: ${data.collarYarnSupplier || ''}
     Q.QTY: ${data.collarYarnQty || ''}
-    Total: ${data.collarYarnTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.collarYarnTotal || 0)}
 
     Tipping Yarn: ${data.tippingYarnType || ''}
     Amount: ${data.tippingYarnAmount || ''} ${data.tippingYarnUnit || ''}
     Per Garment: ${data.tippingYarnPerGarment || ''}
     Supplier: ${data.tippingYarnSupplier || ''}
     Q.QTY: ${data.tippingYarnQty || ''}
-    Total: ${data.tippingYarnTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.tippingYarnTotal || 0)}
 
     Buttons: ${data.buttonMaterial || ''}
     Amount: ${data.buttonAmount || ''} ${data.buttonUnit || ''}
     Per Garment: ${data.buttonPerGarment || ''}
     Supplier: ${data.buttonSupplier || ''}
     Q.QTY: ${data.buttonQty || ''}
-    Total: ${data.buttonTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.buttonTotal || 0)}
 
     Velvet Tapes: ${data.velvetTapeQuality || ''}
     Amount: ${data.velvetTapeMeter || ''} ${data.velvetTapeUnit || ''}
     Per Garment: ${data.velvetTapePerGarment || ''}
     Supplier: ${data.velvetTapeSupplier || ''}
     Q.QTY: ${data.velvetTapeQty || ''}
-    Total: ${data.velvetTapeTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.velvetTapeTotal || 0)}
 
     Wash Care Labels: ${data.washCareQuality || ''}
     Amount: ${data.washCareAmount || ''} ${data.washCareUnit || ''}
     Per Garment: ${data.washCarePerGarment || ''}
     Supplier: ${data.washCareSupplier || ''}
     Q.QTY: ${data.washCareQty || ''}
-    Total: ${data.washCareTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.washCareTotal || 0)}
 
     Polybags: ${data.polybagQuality || ''}
     Size: ${data.polybagSize || ''} ${data.polybagUnit || ''}
     Per Garment: ${data.polybagPerGarment || ''}
     Supplier: ${data.polybagSupplier || ''}
     Q.QTY: ${data.polybagQty || ''}
-    Total: ${data.polybagTotal || 'Rs 0.00/-'}
+    Total: ${formatCurrency(data.polybagTotal || 0)}
 
     ================================
-    GRAND TOTAL: ${data.grandTotal || 'Rs 0.00/-'}
+    COLLAR MEASUREMENTS:
+    ---------------------
+    ${Array.isArray(data.collars) && data.collars.length > 0 ? data.collars.map((c, i) => `Collar MSMTS-${i + 1}: Size: ${c.size || ''} | Dim: ${c.dimensions || ''} | Unit: ${c.unit || ''} | Per Garment: ${c.perGarment || ''} | Supplier: ${c.supplier || ''} | Q.QTY: ${c.qty || ''} | Total: ${formatCurrency(c.total || 0)}`).join('\n    ') : 'None'}
+
+    CUFF MEASUREMENTS:
+    -------------------
+    ${Array.isArray(data.cuffs) && data.cuffs.length > 0 ? data.cuffs.map((c, i) => `Cuff MSMTS-${i + 1}: Size: ${c.size || ''} | Dim: ${c.dimensions || ''} | Unit: ${c.unit || ''} | Per Garment: ${c.perGarment || ''} | Supplier: ${c.supplier || ''} | Q.QTY: ${c.qty || ''} | Total: ${formatCurrency(c.total || 0)}`).join('\n    ') : 'None'}
+
+    ================================
+    GRAND TOTAL: ${formatCurrency(parseFloat(String(data.grandTotal).replace(/[^0-9.]/g, '')) || calculateAllTotals())}
     ================================
         `;
     }
@@ -523,47 +782,58 @@ const currencyRates = {
                 ['QUALITY', 'DETAILS', 'UNIT OF MSMTS', 'PER GARMENT', 'SUPPLIER', 'O.QTY', 'TOTAL AMOUNT'],
                 [''],
                 // Each row below must have exactly 7 columns to match the header
-                ['FABRIC', data.fabricType || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', data.fabricTotal || ''],
+                ['FABRIC', data.fabricType || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', formatCurrency(data.fabricTotal || 0)],
                 [''],
-                ['COLLAR YARN', data.collarYarnType || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', data.collarYarnTotal || ''],
+                ['COLLAR YARN', data.collarYarnType || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', formatCurrency(data.collarYarnTotal || 0)],
                 [''],
-                ['TIPPING YARN', data.tippingYarnType || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', data.tippingYarnTotal || ''],
+                ['TIPPING YARN', data.tippingYarnType || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', formatCurrency(data.tippingYarnTotal || 0)],
                 [''],
                 // Collar measurements - only show if quantity > 0
-                ...((() => {
-                    const q = parseFloat(data.collarQty || '');
-                    if (!isNaN(q) && q > 0) {
-                        const collarDetails = `${data.collarSize || ''}${data.collarDimensions ? ' - ' + data.collarDimensions : ''}`;
-                        return [['COLLAR MSMTS', collarDetails, data.collarUnit || '', data.collarPerGarment || '', data.collarSupplier || '', data.collarQty || '', data.collarTotal || ''], ['']];
-                    }
-                    return [];
-                })()),
-                // Cuff measurements - only show if quantity > 0
-                ...((() => {
-                    const q = parseFloat(data.cuffQty || '');
-                    if (!isNaN(q) && q > 0) {
-                        const cuffDetails = `${data.cuffSize || ''}${data.cuffDimensions ? ' - ' + data.cuffDimensions : ''}`;
-                        return [['CUFF MSMTS', cuffDetails, data.cuffUnit || '', data.cuffPerGarment || '', data.cuffSupplier || '', data.cuffQty || '', data.cuffTotal || ''], ['']];
-                    }
-                    return [];
-                })()),
-                ['BUTTONS', data.buttonMaterial || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', data.buttonTotal || ''],
+                // ===== MULTIPLE COLLAR ROWS =====
+...(data.collars || []).flatMap((c, index) => [
+    [
+        `COLLAR MSMTS-${index + 1}`,
+        `${c.size} - ${c.dimensions}`,
+        c.unit,
+        c.perGarment,
+        c.supplier,
+        c.qty,
+        formatCurrency(c.total)
+    ],
+    ['']
+]),
+
+                // ===== MULTIPLE CUFF ROWS =====
+...(data.cuffs || []).flatMap((c, index) => [
+    [
+        `CUFF MSMTS-${index + 1}`,
+        `${c.size} - ${c.dimensions}`,
+        c.unit,
+        c.perGarment,
+        c.supplier,
+        c.qty,
+        formatCurrency(c.total)
+    ],
+    ['']
+]),
+                ['BUTTONS', data.buttonMaterial || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', formatCurrency(data.buttonTotal || 0)],
                 [''],
-                ['VELVET TAPES', data.velvetTapeQuality || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', data.velvetTapeTotal || ''],
+                ['VELVET TAPES', data.velvetTapeQuality || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', formatCurrency(data.velvetTapeTotal || 0)],
                 [''],
-                ['WASH CARE LABELS', data.washCareQuality || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', data.washCareTotal || ''],
+                ['WASH CARE LABELS', data.washCareQuality || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', formatCurrency(data.washCareTotal || 0)],
                 [''],
                 // Woven size labels - only show if quantity > 0
                 ...((() => {
                     const q = parseFloat(data.wovenSizeQty || '');
                     if (!isNaN(q) && q > 0) {
-                        return [['SIZE LABELS (WVN SIZE LBL)', `WVN SIZE LBL - ${data.wovenSizeLabel || ''}`, data.wovenSizeUnit || '', data.wovenSizePerGarment || '', data.wovenSizeSupplier || '', data.wovenSizeQty || '', data.wovenSizeTotal || ''], ['']];
+                        return [['SIZE LABELS (WVN SIZE LBL)', `WVN SIZE LBL - ${data.wovenSizeLabel || ''}`, data.wovenSizeUnit || '', data.wovenSizePerGarment || '', data.wovenSizeSupplier || '', data.wovenSizeQty || '', formatCurrency(data.wovenSizeTotal || 0)], ['']];
                     }
                     return [];
                 })()),
-                ['POLYBAGS', (data.polybagQuality || '') + (data.polybagSize ? ` - ${data.polybagSize}` : ''), data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', data.polybagTotal || ''],
+                ['POLYBAGS', (data.polybagQuality || '') + (data.polybagSize ? ` - ${data.polybagSize}` : ''), data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', formatCurrency(data.polybagTotal || 0)],
                 [''],
-                ['GRAND TOTAL:', (data.grandTotal && String(data.grandTotal).trim()) ? String(data.grandTotal) : ('\u20B9' + (grandTotal ? grandTotal.toFixed(2) : '0.00'))]
+               ['GRAND TOTAL:', formatCurrency(calculateAllTotals())]
+
             ];
             
             const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -595,7 +865,6 @@ const currencyRates = {
             showAnimatedPopup('Error exporting to Excel. Please try again.', 'error');
         }
     }
-
     // Clear form
     function clearForm() {
         if (confirm('Are you sure you want to clear all form data?')) {
@@ -612,8 +881,12 @@ const currencyRates = {
                 const field = document.getElementById(fieldId);
                 if (field) field.value = '';
             });
-            
-            document.getElementById('grandTotal').textContent = 'Rs 0.00/-';
+            // clear stored INR values as well
+            totalFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && field.dataset) field.dataset.inr = '';
+            });
+            document.getElementById('grandTotal').textContent = formatCurrency(0);
 
             
             // No default values to reset - form will be completely empty
@@ -876,9 +1149,3 @@ const currencyRates = {
         addButtonLoadingStates();
         setupParallaxEffect();
     });
-if (pdfBtn) {
-    pdfBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        exportToPDF();
-    });
-}
