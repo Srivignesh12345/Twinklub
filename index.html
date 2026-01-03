@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twinklub BOM - Bill of Materials</title>
+    <title>Moonland BOM - Bill Of materials</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-tshirt"></i> Twinklub BOM System</h1>
-            <p>Bill of Materials - Garment Manufacturing</p>
+<div class="header-card">
+    <h1>Moonland BOM System</h1>
+  </div>
+  <p class="subtitle">
+    Moonland Bill Of materials - Garment Manufacturing
+  </p>
+</div>
+
         </header>
 
         <form id="bomForm" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
@@ -44,18 +50,8 @@
     </div>
 
     <div class="form-group">
-  <label for="currency">Currency</label>
-  <select id="currency" name="currency" class="form-control">
-    <option value="INR" selected>INR (₹)</option>
-    <option value="USD">USD ($)</option>
-    <option value="EUR">EUR (€)</option>
-    <option value="GBP">GBP (£)</option>
-    <option value="BDT">BDT (৳)</option>
-    <option value="CNY">CNY (¥)</option>
-    <option value="JPY">JPY (¥)</option>
-    <option value="AUD">AUD ($)</option>
-    <option value="CAD">CAD ($)</option>
-  </select>
+  <label for="buyerName">Buyer Name</label>
+  <input type="text" id="buyerName" name="buyerName" class="form-control" placeholder="Enter buyer name">
 </div>
 
 
@@ -63,62 +59,74 @@
 
 </div>
 
-            <!-- Fabric Section -->
+            <!-- Fabric Section (repeatable) -->
             <div class="section">
                 <h2><i class="fas fa-scroll"></i> Fabric</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="fabricType">Fabric Type:</label>
-                        <input type="text" id="fabricType" name="fabricType" placeholder="Enter fabric type" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <div id="fabricBlocks">
+                    <div class="form-row fabric-block">
+                        <div class="form-group">
+                            <label for="fabricType">Fabric Type:</label>
+                            <input type="text" id="fabricType" name="fabricType" class="fabricType" placeholder="Enter fabric type" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricColor">Color:</label>
+                            <input type="text" id="fabricColor" name="fabricColor" class="fabricColor" placeholder="Enter fabric color">
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricAmount">Consumption:</label>
+                            <select id="fabricAmount" name="fabricAmount" class="fabricAmount">
+                                <option value="">Select</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.295">0.295</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricUnit">Unit:</label>
+                            <select id="fabricUnit" name="fabricUnit" class="fabricUnit">
+                                <option value="">Select Unit</option>
+                                <option value="KGS">KGS</option>
+                                <option value="LXW INCHES">LXW INCHES</option>
+                                <option value="NOS">NOS</option>
+                                <option value="METERS">METERS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricPerGarment">Per Garment:</label>
+                            <select id="fabricPerGarment" name="fabricPerGarment" class="fabricPerGarment">
+                                <option value="">Select Per Garment</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricSupplier">Supplier:</label>
+                            <input type="text" id="fabricSupplier" name="fabricSupplier" class="fabricSupplier">
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricQty">Q.QTY:</label>
+                            <input type="number" id="fabricQty" name="fabricQty" class="fabricQty" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="fabricTotal">Quantity:</label>
+                            <input type="text" id="fabricTotal" name="fabricTotal" class="fabricTotal" readonly>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="fabricAmount">Consumption:</label>
-                        <select id="fabricAmount" name="fabricAmount">
-                            <option value="">Select Amount</option>
-                            <option value="0.1">0.1</option>
-                            <option value="0.295">0.295</option>
-                            <option value="0.75">0.75</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="fabricUnit">Unit:</label>
-                        <select id="fabricUnit" name="fabricUnit">
-                            <option value="">Select Unit</option>
-                            
-                            <option value="KGS">KGS</option>
-                            <option value="LXW INCHES">LXW INCHES</option>
-                            <option value="NOS">NOS</option>
-                            <option value="METERS">METERS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="fabricPerGarment">Per Garment:</label>
-                        <select id="fabricPerGarment" name="fabricPerGarment">
-                            <option value="">Select Per Garment</option>
-                            
-                            <option value="0.1">0.1</option>
-                            <option value="0.75">0.75</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="fabricSupplier">Supplier:</label>
-                        <input type="text" id="fabricSupplier" name="fabricSupplier">
-                    </div>
-                    <div class="form-group">
-                        <label for="fabricQty">Q.QTY:</label>
-                        <input type="number" id="fabricQty" name="fabricQty" step="1" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="fabricTotal">Amount (<span class="currency-symbol">₹</span>):</label>
-                        <input type="text" id="fabricTotal" name="fabricTotal" readonly>
+                </div>
+
+                <div class="form-row add-row">
+                    <div class="add-btn-container">
+                        <button type="button" class="add-fabric-btn add-btn">
+                            <i class="fas fa-plus"></i> + Add Another Fabric
+                        </button>
                     </div>
                 </div>
             </div>
@@ -176,7 +184,7 @@
                         <input type="number" id="collarYarnQty" name="collarYarnQty" step="1" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="collarYarnTotal">Amount (<span class="currency-symbol">₹</span>):</label>
+                        <label for="collarYarnTotal">Quantity:</label>
                         <input type="text" id="collarYarnTotal" name="collarYarnTotal" readonly>
                     </div>
                 </div>
@@ -193,7 +201,7 @@
                     <div class="form-group">
                         <label for="tippingYarnAmount">Consumption:</label>
                         <select id="tippingYarnAmount" name="tippingYarnAmount">
-                            <option value="">Select Amount</option>
+                            <option value="">Select</option>
                             <option value="0.005">0.005</option>
                             <option value="0.048">0.048</option>
                             
@@ -237,7 +245,7 @@
                         <input type="number" id="tippingYarnQty" name="tippingYarnQty" step="1" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="tippingYarnTotal">Amount (<span class="currency-symbol">₹</span>):</label>
+                        <label for="tippingYarnTotal">Quantity:</label>
                         <input type="text" id="tippingYarnTotal" name="tippingYarnTotal" readonly>
                     </div>
                 </div>
@@ -312,7 +320,7 @@
             </div>
 
             <div class="form-group">
-                <label>Amount (<span class="currency-symbol">₹</span>):</label>
+                <label>Quantity:</label>
                 <input type="text" name="collarTotal[]" class="collarTotal" readonly>
             </div>
 
@@ -322,8 +330,8 @@
     <!-- ➕ ADD BUTTON (centered) -->
     <div class="form-row add-row">
         <div class="add-btn-container">
-            <button type="button" class="add-collar-btn" onclick="addCollarBlock()">
-                <i class="fas fa-plus"></i> Add Another Collar Size
+            <button type="button" class="add-collar-btn add-btn">
+                <i class="fas fa-plus"></i> + Add Another Collar Size
             </button>
         </div>
     </div>
@@ -385,6 +393,8 @@
                     <option value="0.75">0.75</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
                 </select>
             </div>
 
@@ -399,7 +409,7 @@
             </div>
 
             <div class="form-group">
-                <label>Amount (<span class="currency-symbol">₹</span>):</label>
+                <label>Quantity:</label>
                 <input type="text" name="cuffTotal[]" class="cuffTotal" readonly>
             </div>
 
@@ -409,214 +419,292 @@
     <!-- ➕ ADD BUTTON (centered) -->
     <div class="form-row add-row">
         <div class="add-btn-container">
-            <button type="button" class="add-cuff-btn" onclick="addCuffBlock()">
-                <i class="fas fa-plus"></i> Add Another Cuff Size
+            <button type="button" class="add-cuff-btn add-btn">
+                <i class="fas fa-plus"></i> + Add Another Cuff Size
             </button>
         </div>
     </div>
 </div>
 
 
-            <!-- Buttons Section -->
+            <!-- Buttons Section (repeatable) -->
             <div class="section">
                 <h2><i class="fas fa-circle-dot"></i> Buttons</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="buttonMaterial">Mat. of Button:</label>
-                        <input type="text" id="buttonMaterial" name="buttonMaterial" placeholder="Enter button material">
+                <div id="buttonBlocks">
+                    <div class="form-row button-block">
+                        <div class="form-group">
+                            <label for="buttonMaterial">Mat. of Button:</label>
+                            <input type="text" id="buttonMaterial" name="buttonMaterial" class="buttonMaterial" placeholder="Enter button material">
+                        </div>
+                        <div class="form-group">
+                            <label for="buttonAmount">Consumption:</label>
+                            <input type="number" id="buttonAmount" name="buttonAmount" class="buttonAmount" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="buttonUnit">Unit:</label>
+                            <select id="buttonUnit" name="buttonUnit" class="buttonUnit">
+                                <option value="">Select Unit</option>
+                                <option value="KGS">KGS</option>
+                                <option value="LXW INCHES">LXW INCHES</option>
+                                <option value="NOS">NOS</option>
+                                <option value="METERS">METERS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="buttonPerGarment">Per Garment:</label>
+                            <select id="buttonPerGarment" name="buttonPerGarment" class="buttonPerGarment">
+                                <option value="">Select Per Garment</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="buttonSupplier">Supplier:</label>
+                            <input type="text" id="buttonSupplier" name="buttonSupplier" class="buttonSupplier">
+                        </div>
+                        <div class="form-group">
+                            <label for="buttonQty">Q.QTY:</label>
+                            <input type="number" id="buttonQty" name="buttonQty" class="buttonQty" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="buttonTotal">Quantity:</label>
+                            <input type="text" id="buttonTotal" name="buttonTotal" class="buttonTotal" readonly>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="buttonAmount">Consumption:</label>
-                        <input type="number" id="buttonAmount" name="buttonAmount" step="0.001" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="buttonUnit">Unit:</label>
-                        <select id="buttonUnit" name="buttonUnit">
-                            <option value="">Select Unit</option>
-                            <option value="KGS">KGS</option>
-                            <option value="LXW INCHES">LXW INCHES</option>
-                            <option value="NOS">NOS</option>
-                            <option value="METERS">METERS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="buttonPerGarment">Per Garment:</label>
-                        <select id="buttonPerGarment" name="buttonPerGarment">
-                            <option value="">Select Per Garment</option>
-                            <option value="0.1">0.1</option>
-                            <option value="0.75">0.75</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="buttonSupplier">Supplier:</label>
-                        <input type="text" id="buttonSupplier" name="buttonSupplier">
-                    </div>
-                    <div class="form-group">
-                        <label for="buttonQty">Q.QTY:</label>
-                        <input type="number" id="buttonQty" name="buttonQty" step="1" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="buttonTotal">Amount (<span class="currency-symbol">₹</span>):</label>
-                        <input type="text" id="buttonTotal" name="buttonTotal" readonly>
+                </div>
+
+                <div class="form-row add-row">
+                    <div class="add-btn-container">
+                        <button type="button" class="add-button-btn add-btn">
+                            <i class="fas fa-plus"></i> + Add Another Button Item
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Velvet Tapes Section -->
+            <!-- Velvet Tapes Section (repeatable) -->
             <div class="section">
                 <h2><i class="fas fa-tape"></i> Velvet Tapes</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="velvetTapeQuality">Velvet Tape:</label>
-                        <input type="text" id="velvetTapeQuality" name="velvetTapeQuality" placeholder="Enter velvet tape quality">
+                <div id="velvetBlocks">
+                    <div class="form-row velvet-block">
+                        <div class="form-group">
+                            <label for="velvetTapeQuality">Velvet Tape:</label>
+                            <input type="text" id="velvetTapeQuality" name="velvetTapeQuality" class="velvetTapeQuality" placeholder="Enter velvet tape quality">
+                        </div>
+                        <div class="form-group">
+                            <label for="velvetTapeMeter">Meter:</label>
+                            <input type="number" id="velvetTapeMeter" name="velvetTapeMeter" class="velvetTapeMeter" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="velvetTapeUnit">Unit:</label>
+                            <select id="velvetTapeUnit" name="velvetTapeUnit" class="velvetTapeUnit">
+                                <option value="">Select Unit</option>
+                                <option value="KGS">KGS</option>
+                                <option value="LXW INCHES">LXW INCHES</option>
+                                <option value="NOS">NOS</option>
+                                <option value="METERS">METERS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="velvetTapePerGarment">Per Garment:</label>
+                            <select id="velvetTapePerGarment" name="velvetTapePerGarment" class="velvetTapePerGarment">
+                                <option value="">Select Per Garment</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="velvetTapeSupplier">Supplier:</label>
+                            <input type="text" id="velvetTapeSupplier" name="velvetTapeSupplier" class="velvetTapeSupplier">
+                        </div>
+                        <div class="form-group">
+                            <label for="velvetTapeQty">Q.QTY:</label>
+                            <input type="number" id="velvetTapeQty" name="velvetTapeQty" class="velvetTapeQty" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="velvetTapeTotal">Quantity:</label>
+                            <input type="text" id="velvetTapeTotal" name="velvetTapeTotal" class="velvetTapeTotal" readonly>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="velvetTapeMeter">Meter:</label>
-                        <input type="number" id="velvetTapeMeter" name="velvetTapeMeter" step="0.001" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="velvetTapeUnit">Unit:</label>
-                        <select id="velvetTapeUnit" name="velvetTapeUnit">
-                            <option value="">Select Unit</option>
-                            <option value="KGS">KGS</option>
-                            <option value="LXW INCHES">LXW INCHES</option>
-                            <option value="NOS">NOS</option>
-                            <option value="METERS">METERS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="velvetTapePerGarment">Per Garment:</label>
-                        <select id="velvetTapePerGarment" name="velvetTapePerGarment">
-                            <option value="">Select Per Garment</option>
-                            <option value="0.1">0.1</option>
-                            <option value="0.75">0.75</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="velvetTapeSupplier">Supplier:</label>
-                        <input type="text" id="velvetTapeSupplier" name="velvetTapeSupplier">
-                    </div>
-                    <div class="form-group">
-                        <label for="velvetTapeQty">Q.QTY:</label>
-                        <input type="number" id="velvetTapeQty" name="velvetTapeQty" step="1" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="velvetTapeTotal">Amount (<span class="currency-symbol">₹</span>):</label>
-                        <input type="text" id="velvetTapeTotal" name="velvetTapeTotal" readonly>
+                </div>
+
+                <div class="form-row add-row">
+                    <div class="add-btn-container">
+                        <button type="button" class="add-velvet-btn add-btn">
+                            <i class="fas fa-plus"></i> + Add Another Velvet Tape
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Wash Care Labels Section -->
+            <!-- Wash Care Labels Section (repeatable) -->
             <div class="section">
                 <h2><i class="fas fa-tag"></i> Wash Care Labels</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="washCareQuality">Wash Care Labels:</label>
-                        <input type="text" id="washCareQuality" name="washCareQuality" placeholder="Enter wash care label quality">
+                <div id="washCareBlocks">
+                    <div class="form-row washcare-block">
+                        <div class="form-group">
+                            <label for="washCareQuality">Wash Care Labels:</label>
+                            <input type="text" id="washCareQuality" name="washCareQuality" class="washCareQuality" placeholder="Enter wash care label quality">
+                        </div>
+                        <div class="form-group">
+                            <label for="washCareAmount">Consumption:</label>
+                            <input type="number" id="washCareAmount" name="washCareAmount" class="washCareAmount" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="washCareUnit">Unit:</label>
+                            <select id="washCareUnit" name="washCareUnit" class="washCareUnit">
+                                <option value="">Select Unit</option>
+                                <option value="KGS">KGS</option>
+                                <option value="LXW INCHES">LXW INCHES</option>
+                                <option value="NOS">NOS</option>
+                                <option value="METERS">METERS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="washCarePerGarment">Per Garment:</label>
+                            <select id="washCarePerGarment" name="washCarePerGarment" class="washCarePerGarment">
+                                <option value="">Select Per Garment</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="washCareSupplier">Supplier:</label>
+                            <input type="text" id="washCareSupplier" name="washCareSupplier" class="washCareSupplier">
+                        </div>
+                        <div class="form-group">
+                            <label for="washCareQty">Q.QTY:</label>
+                            <input type="number" id="washCareQty" name="washCareQty" class="washCareQty" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="washCareTotal">Quantity:</label>
+                            <input type="text" id="washCareTotal" name="washCareTotal" class="washCareTotal" readonly>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="washCareAmount">Consumption:</label>
-                        <input type="number" id="washCareAmount" name="washCareAmount" step="0.001" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="washCareUnit">Unit:</label>
-                        <select id="washCareUnit" name="washCareUnit">
-                            <option value="">Select Unit</option>
-                            <option value="KGS">KGS</option>
-                            <option value="LXW INCHES">LXW INCHES</option>
-                            <option value="NOS">NOS</option>
-                            <option value="METERS">METERS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="washCarePerGarment">Per Garment:</label>
-                        <select id="washCarePerGarment" name="washCarePerGarment">
-                            <option value="">Select Per Garment</option>
-                            <option value="0.1">0.1</option>
-                            <option value="0.75">0.75</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="washCareSupplier">Supplier:</label>
-                        <input type="text" id="washCareSupplier" name="washCareSupplier">
-                    </div>
-                    <div class="form-group">
-                        <label for="washCareQty">Q.QTY:</label>
-                        <input type="number" id="washCareQty" name="washCareQty" step="1" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="washCareTotal">Amount (<span class="currency-symbol">₹</span>):</label>
-                        <input type="text" id="washCareTotal" name="washCareTotal" readonly>
+                </div>
+
+                <div class="form-row add-row">
+                    <div class="add-btn-container">
+                        <button type="button" class="add-washcare-btn add-btn">
+                            <i class="fas fa-plus"></i> + Add Another Wash Care Label
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Woven Size Labels Section -->
+            <!-- Woven Size Labels Section (repeatable) -->
             <div class="section">
                 <h2><i class="fas fa-tag"></i> Woven Size Labels</h2>
+                <div id="wovenBlocks">
+                    <div class="form-row woven-block">
+                        <div class="form-group">
+                            <label for="wovenSizeLabel">Size:</label>
+                            <select id="wovenSizeLabel" name="wovenSizeLabel" class="wovenSizeLabel">
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="2XL">2XL</option>
+                                <option value="3XL">3XL</option>
+                                <option value="4XL">4XL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wovenSizeAmount">Consumption:</label>
+                            <input type="number" id="wovenSizeAmount" name="wovenSizeAmount" class="wovenSizeAmount" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="wovenSizeUnit">Unit:</label>
+                            <select id="wovenSizeUnit" name="wovenSizeUnit" class="wovenSizeUnit">
+                                <option value="">Select Unit</option>
+                                <option value="KGS">KGS</option>
+                                <option value="LXW INCHES">LXW INCHES</option>
+                                <option value="NOS">NOS</option>
+                                <option value="METERS">METERS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wovenSizePerGarment">Per Garment:</label>
+                            <select id="wovenSizePerGarment" name="wovenSizePerGarment" class="wovenSizePerGarment">
+                                <option value="">Select Per Garment</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wovenSizeSupplier">Supplier:</label>
+                            <input type="text" id="wovenSizeSupplier" name="wovenSizeSupplier" class="wovenSizeSupplier">
+                        </div>
+                        <div class="form-group">
+                            <label for="wovenSizeQty">Q.QTY:</label>
+                            <input type="number" id="wovenSizeQty" name="wovenSizeQty" class="wovenSizeQty" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="wovenSizeTotal">Quantity:</label>
+                            <input type="text" id="wovenSizeTotal" name="wovenSizeTotal" class="wovenSizeTotal" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row add-row">
+                    <div class="add-btn-container">
+                        <button type="button" class="add-woven-btn add-btn">
+                            <i class="fas fa-plus"></i> + Add Another Woven Label
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Printing & Embroidery Section -->
+            <div class="section">
+                <h2><i class="fas fa-print"></i> Printing & Embroidery</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="wovenSizeLabel">Size:</label>
-                        <select id="wovenSizeLabel" name="wovenSizeLabel">
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="2XL">2XL</option>
-                            <option value="3XL">3XL</option>
-                            <option value="4XL">4XL</option>
+                        <label for="printing">Printing:</label>
+                        <input type="text" id="printing" name="printing" placeholder="e.g., Screen Print - Front">
+                    </div>
+                    <div class="form-group">
+                        <label for="embroidery">Embroidery:</label>
+                        <input type="text" id="embroidery" name="embroidery" placeholder="e.g., Chest Embroidery">
+                    </div>
+                    <div class="form-group">
+                        <label for="printFront">Front</label>
+                        <input type="text" id="printFront" name="printFront" placeholder="e.g., Chest, Pocket">
+                    </div>
+                    <div class="form-group">
+                        <label for="printBack">Back</label>
+                        <input type="text" id="printBack" name="printBack" placeholder="e.g., Back Yoke">
+                    </div>
+                    <div class="form-group">
+                        <label for="printSleeve">Sleeve</label>
+                        <input type="text" id="printSleeve" name="printSleeve" placeholder="e.g., Left Sleeve">
+                    </div> 
+                    <div class="form-group">
+                        <label for="packing">Packing</label>
+                        <input type="text" id="packing" name="packing" placeholder="e.g., 2 FOLD MASTER POLYBAG">
+                    </div>
+                    <div class="form-group">
+                        <label for="tagRequired">Tag Required</label>
+                        <select id="tagRequired" name="tagRequired">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="wovenSizeAmount">Consumption:</label>
-                        <input type="number" id="wovenSizeAmount" name="wovenSizeAmount" step="0.001" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="wovenSizeUnit">Unit:</label>
-                        <select id="wovenSizeUnit" name="wovenSizeUnit">
-                            <option value="">Select Unit</option>
-                            <option value="KGS">KGS</option>
-                            <option value="LXW INCHES">LXW INCHES</option>
-                            <option value="NOS">NOS</option>
-                            <option value="METERS">METERS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="wovenSizePerGarment">Per Garment:</label>
-                        <select id="wovenSizePerGarment" name="wovenSizePerGarment">
-                            <option value="">Select Per Garment</option>
-                            <option value="0.1">0.1</option>
-                            <option value="0.75">0.75</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="wovenSizeSupplier">Supplier:</label>
-                        <input type="text" id="wovenSizeSupplier" name="wovenSizeSupplier">
-                    </div>
-                    <div class="form-group">
-                        <label for="wovenSizeQty">Q.QTY:</label>
-                        <input type="number" id="wovenSizeQty" name="wovenSizeQty" step="1" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="wovenSizeTotal">Amount (<span class="currency-symbol">₹</span>):</label>
-                        <input type="text" id="wovenSizeTotal" name="wovenSizeTotal" readonly>
                     </div>
                 </div>
             </div>
@@ -664,11 +752,13 @@
                         <input type="number" id="polybagQty" name="polybagQty" step="1" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="polybagTotal">Amount (<span class="currency-symbol">₹</span>):</label>
+                        <label for="polybagTotal">Quantity:</label>
                         <input type="text" id="polybagTotal" name="polybagTotal" readonly>
                     </div>
                 </div>
             </div>
+
+
 
             <!-- Total Summary -->
             <div class="section total-section">
@@ -676,7 +766,7 @@
                 <div class="total-display">
                     <div class="total-item">
                         <span>Total Consumption:</span>
-                        <span id="grandTotal">₹0.00</span>
+                        <span id="grandTotal">0</span>
                     </div>
                 </div>
             </div>
@@ -700,5 +790,27 @@
     <script src="https://cdn.jsdelivr.net/npm/docx@8.2.3/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="script.js"></script>
+ 
+    <br>
+    
+  <!-- Bottom -->
+  <div class="footer-bottom">
+    <p>© 2026, Yotta Forge</p>
+        <div>
+      <p> For Any Website Requirements Contact us : +91 86086-33110</p>
+      <p> yottaforgeofficial@gmail.com</p>
+      <p class="website">🌐 Website : 
+  <a href="https://yottaforge.netlify.app/" target="_blank">
+    Yotta Forge
+  </a>
+</p>
+
+      </div>
+  </div>
+
+  </div>
+
+
+    </footer>
 </body>
 </html> 
