@@ -121,6 +121,18 @@ header p {
     font-size: 1.1rem;
     font-weight: 500;
 }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.logo {
+  height: 50px;       /* adjust if needed */
+  width: auto;
+  object-fit: contain;
+}
 
 /* Form Styles */
 #bomForm {
@@ -208,6 +220,122 @@ header p {
     background: #ecf0f1;
     color: #7f8c8d;
     cursor: not-allowed;
+}
+
+/* Repeatable blocks: keep same simple layout as Collar/Cuff (no decorative card) */
+.form-row.fabric-block,
+.form-row.button-block,
+.form-row.velvet-block,
+.form-row.washcare-block,
+.form-row.woven-block,
+.form-row.collar-block,
+.form-row.cuff-block {
+    /* Use same grid/layout as .form-row for consistency */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+    padding: 0;
+    margin-bottom: 12px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    position: relative;
+}
+
+/* Removed per-block remove button styles */
+
+/* Ensure inputs in duplicated blocks span full available width (keeps behavior similar to collar/cuff) */
+.form-row.fabric-block .form-group input,
+.form-row.fabric-block .form-group select,
+.form-row.button-block .form-group input,
+.form-row.button-block .form-group select,
+.form-row.velvet-block .form-group input,
+.form-row.velvet-block .form-group select,
+.form-row.washcare-block .form-group input,
+.form-row.washcare-block .form-group select,
+.form-row.woven-block .form-group input,
+.form-row.woven-block .form-group select {
+    width: 100%;
+} 
+
+/* Add button container and button styles */
+.add-btn-container {
+    display: flex;
+    justify-content: center; /* center the add button like the screenshot */
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+}
+
+/* Styled dashed add button that matches the screenshot */
+.add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 12px;
+    border: 2px dashed #138496;
+    background: #ffffff;
+    color: #138496;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(19,132,150,0.04);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.add-btn i {
+    font-size: 0.95rem;
+    color: #138496;
+}
+.add-btn:hover {
+    transform: translateY(-3px);
+    background: rgba(19,132,150,0.04);
+    box-shadow: 0 8px 22px rgba(19,132,150,0.07);
+}
+/* Hide the auto-generated section count text next to add buttons */
+.section-count {
+    display: none !important;
+}
+/* Temporary feedback text shown when a block is added */
+.add-feedback {
+    color: #27ae60;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-left: 10px;
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.add-feedback.fade-out {
+    opacity: 0;
+    transform: translateY(-6px);
+} 
+
+/* Make sure add button is full width on small screens */
+@media (max-width: 600px) {
+    .add-btn-container {
+        justify-content: center;
+    }
+    .add-btn-container button {
+        width: 100%;
+        max-width: 360px;
+    }
+}
+
+/* Highlight animation for newly added blocks */
+.newly-added {
+    animation: highlight 1.6s ease;
+    border-radius: 8px;
+}
+
+@keyframes highlight {
+    0% { box-shadow: 0 0 0 0 rgba(52,152,219,0.0); }
+    25% { box-shadow: 0 8px 28px rgba(52,152,219,0.18); }
+    60% { box-shadow: 0 6px 20px rgba(52,152,219,0.10); }
+    100% { box-shadow: 0 0 0 0 rgba(52,152,219,0.0); }
 }
 
 /* Total Section Styles */
@@ -831,3 +959,31 @@ input, select {
     justify-content: center;
     align-items: center;
 }
+.footer {
+  background: #1f2430;
+  color: #cfcfcf;
+  padding: 20px 40px 20px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+    border-radius: 24px;
+
+}
+
+
+.footer-bottom {
+  padding-top: 20px;
+  text-align: center;
+  font-size: medium;
+    border-radius: 24px;
+
+}
+
+.footer-bottom p {
+  font-size: large;
+ border-radius: 24px;
+
+  margin-bottom: 15px;
+}
+
+
+
