@@ -1,69 +1,24 @@
     // Global variables
     let formData = {};
 
-    // ===== Currency Conversion Rates (Base = INR) =====
-const currencyRates = {
-    INR: 1,
-    USD: 0.012,
-    EUR: 0.011,
-    GBP: 0.0095,
-    BDT: 1.32,
-    CNY: 0.086,
-    JPY: 1.75,
-    AUD: 0.018,
-    CAD: 0.016
-};
-
-// Currency symbols for display
-const currencySymbols = {
-    INR: '₹',
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
-    BDT: '৳',
-    CNY: '¥',
-    JPY: '¥',
-    AUD: '$',
-    CAD: '$'
-};
-
-
-    function formatRs(value) {
-        const num = parseFloat(String(value).replace(/[^0-9.]/g, ''));
-        return `Rs ${isNaN(num) ? '0.00' : num.toFixed(2)}/-`;
-    }
-
-    function safeNumber(value) {
-        const num = parseFloat(String(value).replace(/[^0-9.]/g, ''));
-        return isNaN(num) ? 0 : num;
-    }
-
-    function formatCurrency(inrValue) {
-    const currency = document.getElementById('currency')?.value || 'INR';
-    const rate = currencyRates[currency] || 1;
-
-    const base = parseFloat(String(inrValue).replace(/[^0-9.]/g, '')) || 0;
-    const converted = base * rate;
-
-        const symbol = currencySymbols[currency] || currency;
-        // For INR previously used Rs .../-, keep concise symbol-based formatting
-        return `${symbol}${converted.toFixed(2)}`;
+    // Quantity formatting helper
+function formatQuantity(value) {
+    const num = parseFloat(String(value).replace(/[^0-9.]/g, '')) || 0;
+    // Show up to 6 decimals and trim trailing zeros
+    let s = Number(num.toFixed(6)).toString();
+    if (s.indexOf('.') >= 0) s = s.replace(/\.0+$|0+$/,'').replace(/\.$/, '');
+    return s;
 }
 
-// Update all visible currency symbol spans to match selected currency
-function updateCurrencySymbols() {
-    const currency = document.getElementById('currency')?.value || 'INR';
-    const symbol = currencySymbols[currency] || currency;
-    document.querySelectorAll('.currency-symbol').forEach(el => {
-        el.textContent = symbol;
-    });
+function safeNumber(value) {
+    const num = parseFloat(String(value).replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
 }
 
     // DOM Content Loaded
     document.addEventListener('DOMContentLoaded', function() {
         initializeForm();
         setupEventListeners();
-        updateCurrencySymbols();
         setupCalculationListeners();
         setupTheme();
         setupScrollAnimations();
@@ -87,13 +42,7 @@ function updateCurrencySymbols() {
         const clearBtn = document.getElementById('clearBtn');
 
             // Currency change → recalculate totals
-    const currencySelect = document.getElementById('currency');
-    if (currencySelect) {
-        currencySelect.addEventListener('change', function() {
-            updateCurrencySymbols();
-            calculateAllTotals();
-        });
-    }
+
 
         
         if (excelBtn) {
@@ -114,6 +63,52 @@ function updateCurrencySymbols() {
             console.log('Clear button listener added');
         }
         
+        // Attach Add-Item button listeners and create counters
+        const addBtnMapping = [
+            ['.add-fabric-btn', addFabricBlock, 'fabricBlocks'],
+            ['.add-button-btn', addButtonBlock, 'buttonBlocks'],
+            ['.add-velvet-btn', addVelvetBlock, 'velvetBlocks'],
+            ['.add-washcare-btn', addWashCareBlock, 'washCareBlocks'],
+            ['.add-woven-btn', addWovenBlock, 'wovenBlocks'],
+            ['.add-collar-btn', addCollarBlock, 'collarBlocks'],
+            ['.add-cuff-btn', addCuffBlock, 'cuffBlocks']
+        ];
+
+        addBtnMapping.forEach(([selector, fn, containerId]) => {
+            document.querySelectorAll(selector).forEach(btn => {
+                // avoid attaching multiple listeners if setupEventListeners runs more than once
+                if (!btn.dataset.listenerBound) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (btn.disabled) return; // debounce double clicks
+                        btn.disabled = true;
+                        try {
+                            console.log(`Add button clicked for ${selector}`);
+                            fn();
+                            // after adding, update counters
+                            updateSectionCounts(containerId, btn);
+                        } finally {
+                            // re-enable after a short delay
+                            setTimeout(() => { btn.disabled = false; }, 300);
+                        }
+                    });
+                    btn.dataset.listenerBound = 'true';
+                }
+
+                // Ensure button is visible and clickable - add a focus outline
+                btn.style.cursor = 'pointer';
+                btn.style.pointerEvents = 'auto';
+            });
+        });
+
+
+
+        // Utility: update a section counter (called after add)
+        function updateSectionCounts(containerId, btn) {
+            // Removed persistent section-count display per user request
+            return;
+        }
+
         // Form submission
         const form = document.getElementById('bomForm');
         if (form) {
@@ -151,7 +146,7 @@ function updateCurrencySymbols() {
     // Theme setup and utilities
     function setupTheme() {
         try {
-            const savedTheme = localStorage.getItem('twinklub_theme');
+            const savedTheme = localStorage.getItem('moonland_theme');
             const osPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             const initialTheme = savedTheme || (osPrefersDark ? 'dark' : 'light');
             applyTheme(initialTheme);
@@ -170,7 +165,7 @@ function updateCurrencySymbols() {
                 const mql = window.matchMedia('(prefers-color-scheme: dark)');
                 if (typeof mql.addEventListener === 'function') {
                     mql.addEventListener('change', function(e) {
-                        const userSet = localStorage.getItem('twinklub_theme');
+                        const userSet = localStorage.getItem('moonland_theme');
                         if (!userSet) {
                             applyTheme(e.matches ? 'dark' : 'light');
                         }
@@ -178,7 +173,7 @@ function updateCurrencySymbols() {
                 } else if (typeof mql.addListener === 'function') {
                     // Older browsers
                     mql.addListener(function(e) {
-                        const userSet = localStorage.getItem('twinklub_theme');
+                        const userSet = localStorage.getItem('moonland_theme');
                         if (!userSet) {
                             applyTheme(e.matches ? 'dark' : 'light');
                         }
@@ -190,14 +185,7 @@ function updateCurrencySymbols() {
         }
 
         document.addEventListener('input', function (e) {
-    if (
-        e.target.classList.contains('collarPerGarment') ||
-        e.target.classList.contains('collarQty') ||
-        e.target.classList.contains('cuffPerGarment') ||
-        e.target.classList.contains('cuffQty')
-    ) {
-        calculateAllTotals();
-    }
+    calculateAllTotals();
 });
 
     }
@@ -206,7 +194,7 @@ function updateCurrencySymbols() {
         if (theme !== 'light' && theme !== 'dark') return;
         document.documentElement.setAttribute('data-theme', theme);
         try {
-            localStorage.setItem('twinklub_theme', theme);
+            localStorage.setItem('moonland_theme', theme);
         } catch (_) {
             // ignore storage errors
         }
@@ -224,64 +212,126 @@ function updateCurrencySymbols() {
         
         const totalField = document.getElementById(totalId);
         if (totalField) {
-            // store raw INR value for exports and calculations
-            totalField.dataset.inr = String(Number((total || 0).toFixed(2)));
-            // display converted value according to selected currency
-            totalField.value = formatCurrency(total);
+            // store raw numeric quantity for exports and calculations
+            totalField.dataset.inr = String(Number((total || 0).toFixed(6)));
+            // display numeric quantity
+            totalField.value = formatQuantity(total);
         }
         return total;
     }
 
     function calculateMultipleCollars() {
-    let total = 0;
+        let total = 0;
 
-    document.querySelectorAll('.collar-block').forEach(block => {
-        const perGarment = parseFloat(block.querySelector('.collarPerGarment')?.value || 0);
-        const qty = parseFloat(block.querySelector('.collarQty')?.value || 0);
+        document.querySelectorAll('.collar-block').forEach(block => {
+            const perGarment = parseFloat(block.querySelector('.collarPerGarment')?.value || 0);
+            const qty = parseFloat(block.querySelector('.collarQty')?.value || 0);
 
-        const amount = perGarment * qty;
+            const amount = perGarment * qty;
 
-        const totalField = block.querySelector('.collarTotal');
-        if (totalField) {
-            totalField.dataset.inr = String(Number((amount || 0).toFixed(2)));
-            totalField.value = formatCurrency(amount);
-        }
+            const totalField = block.querySelector('.collarTotal');
+            if (totalField) {
+                totalField.dataset.inr = String(Number((amount || 0).toFixed(6)));
+                totalField.value = formatQuantity(amount);
+            }
 
-        total += amount;
-    });
+            total += amount;
+        });
 
-    return total;
-}
+        return total;
+    }
 
-function calculateMultipleCuffs() {
-    let total = 0;
+    function calculateMultipleCuffs() {
+        let total = 0;
 
-    document.querySelectorAll('.cuff-block').forEach(block => {
-        const perGarment = parseFloat(block.querySelector('.cuffPerGarment')?.value || 0);
-        const qty = parseFloat(block.querySelector('.cuffQty')?.value || 0);
+        document.querySelectorAll('.cuff-block').forEach(block => {
+            const perGarment = parseFloat(block.querySelector('.cuffPerGarment')?.value || 0);
+            const qty = parseFloat(block.querySelector('.cuffQty')?.value || 0);
 
-        const amount = perGarment * qty;
+            const amount = perGarment * qty;
 
-        const totalField = block.querySelector('.cuffTotal');
-        if (totalField) {
-            totalField.dataset.inr = String(Number((amount || 0).toFixed(2)));
-            totalField.value = formatCurrency(amount);
-        }
+            const totalField = block.querySelector('.cuffTotal');
+            if (totalField) {
+                totalField.dataset.inr = String(Number((amount || 0).toFixed(6)));
+                totalField.value = formatQuantity(amount);
+            }
 
-        total += amount;
-    });
+            total += amount;
+        });
 
-    return total;
-}
+        return total;
+    }
 
+    function calculateMultipleButtons() {
+        let total = 0;
+        document.querySelectorAll('.button-block').forEach(block => {
+            const perGarment = parseFloat(block.querySelector('.buttonPerGarment')?.value || 0);
+            const qty = parseFloat(block.querySelector('.buttonQty')?.value || 0);
+            const amount = perGarment * qty;
+            const totalField = block.querySelector('.buttonTotal');
+            if (totalField) {
+                totalField.dataset.inr = String(Number((amount || 0).toFixed(6)));
+                totalField.value = formatQuantity(amount);
+            }
+            total += amount;
+        });
+        return total;
+    }
 
+    function calculateMultipleVelvet() {
+        let total = 0;
+        document.querySelectorAll('.velvet-block').forEach(block => {
+            const perGarment = parseFloat(block.querySelector('.velvetTapePerGarment')?.value || 0);
+            const qty = parseFloat(block.querySelector('.velvetTapeQty')?.value || 0);
+            const amount = perGarment * qty;
+            const totalField = block.querySelector('.velvetTapeTotal');
+            if (totalField) {
+                totalField.dataset.inr = String(Number((amount || 0).toFixed(6)));
+                totalField.value = formatQuantity(amount);
+            }
+            total += amount;
+        });
+        return total;
+    }
+
+    function calculateMultipleWashCare() {
+        let total = 0;
+        document.querySelectorAll('.washcare-block').forEach(block => {
+            const perGarment = parseFloat(block.querySelector('.washCarePerGarment')?.value || 0);
+            const qty = parseFloat(block.querySelector('.washCareQty')?.value || 0);
+            const amount = perGarment * qty;
+            const totalField = block.querySelector('.washCareTotal');
+            if (totalField) {
+                totalField.dataset.inr = String(Number((amount || 0).toFixed(6)));
+                totalField.value = formatQuantity(amount);
+            }
+            total += amount;
+        });
+        return total;
+    }
+
+    function calculateMultipleWoven() {
+        let total = 0;
+        document.querySelectorAll('.woven-block').forEach(block => {
+            const perGarment = parseFloat(block.querySelector('.wovenSizePerGarment')?.value || 0);
+            const qty = parseFloat(block.querySelector('.wovenSizeQty')?.value || 0);
+            const amount = perGarment * qty;
+            const totalField = block.querySelector('.wovenSizeTotal');
+            if (totalField) {
+                totalField.dataset.inr = String(Number((amount || 0).toFixed(6)));
+                totalField.value = formatQuantity(amount);
+            }
+            total += amount;
+        });
+        return total;
+    }
 
     // Calculate all totals
     function calculateAllTotals() {
         let grandTotal = 0;
         
-        // Fabric 1
-        grandTotal += calculateSectionTotal('fabricAmount', 'fabricPerGarment', 'fabricQty', 'fabricTotal');
+        // Fabrics (multiple blocks)
+        grandTotal += calculateMultipleFabrics();
         
         // Fabric 2 removed (no second fabric section in input)
         
@@ -300,60 +350,103 @@ function calculateMultipleCuffs() {
         // Multiple Cuff Measurements
         grandTotal += calculateMultipleCuffs();
         
-        // Buttons: compute as perGarment * qty only (ignore amount)
-        grandTotal += calculateSectionTotal('', 'buttonPerGarment', 'buttonQty', 'buttonTotal');
+        // Buttons (multiple blocks handled)
+        grandTotal += calculateMultipleButtons();
         
-        // Velvet Tapes
-        grandTotal += calculateSectionTotal('velvetTapeMeter', 'velvetTapePerGarment', 'velvetTapeQty', 'velvetTapeTotal');
+        // Velvet Tapes (multiple blocks)
+        grandTotal += calculateMultipleVelvet();
         
-        // Wash Care Labels
-        grandTotal += calculateSectionTotal('washCareAmount', 'washCarePerGarment', 'washCareQty', 'washCareTotal');
+        // Wash Care Labels (multiple blocks)
+        grandTotal += calculateMultipleWashCare();
         
-        // Woven Size Labels
-        grandTotal += calculateSectionTotal('wovenSizeAmount', 'wovenSizePerGarment', 'wovenSizeQty', 'wovenSizeTotal');
+        // Woven Size Labels (multiple blocks)
+        grandTotal += calculateMultipleWoven();
         
         // Polybags (only per garment * qty)
         grandTotal += calculateSectionTotal('', 'polybagPerGarment', 'polybagQty', 'polybagTotal');
         
-        // Update grand total display with explicit Unicode rupee to avoid encoding issues
-        document.getElementById('grandTotal').textContent = formatCurrency(grandTotal);
+        // Update grand total display (quantity-based)
+        document.getElementById('grandTotal').textContent = formatQuantity(grandTotal);
     
         return grandTotal;
     }
-    function addCollarBlock() {
-    const container = document.getElementById('collarBlocks');
-    if (!container) return;
+    // Generic helper to add a new repeatable block
+function addBlock({containerId, blockSelector, feedbackText = 'Added', focus = true}) {
+    const container = document.getElementById(containerId);
+    if (!container) { console.warn(`addBlock: container ${containerId} not found`); return null; }
 
-    const firstBlock = container.querySelector('.collar-block');
-    if (!firstBlock) return;
+    const template = container.querySelector(blockSelector);
+    if (!template) { console.warn(`addBlock: template ${blockSelector} not found in ${containerId}`); return null; }
 
-    const clone = firstBlock.cloneNode(true);
+    const clone = template.cloneNode(true);
 
-    clone.querySelectorAll('input, select').forEach(el => {
+    clone.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.id) el.removeAttribute('id');
         if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
         else el.value = '';
+        // attach listeners so cloned inputs recalc
+        el.addEventListener('input', calculateAllTotals);
+        el.addEventListener('change', calculateAllTotals);
     });
 
     container.appendChild(clone);
+
+    const count = container.querySelectorAll(blockSelector).length;
+
+    clone.scrollIntoView({behavior:'smooth', block:'center'});
+    const firstInput = clone.querySelector('input, select, textarea');
+    if (firstInput && focus) firstInput.focus();
+
+    clone.classList.add('newly-added');
+    setTimeout(() => clone.classList.remove('newly-added'), 1800);
+
+    // transient feedback and update counter
+    const addBtnWrap = container.parentElement ? container.parentElement.querySelector('.add-btn-container') : null;
+    if (addBtnWrap) {
+        const fb = document.createElement('div'); fb.className = 'add-feedback'; fb.textContent = `${feedbackText}`;
+        addBtnWrap.appendChild(fb);
+        setTimeout(() => { fb.classList.add('fade-out'); setTimeout(()=>fb.remove(),300); }, 900);
+    }
+
+    calculateAllTotals();
+    return clone;
 }
 
-function addCuffBlock() {
-    const container = document.getElementById('cuffBlocks');
-    if (!container) return;
+// Section-specific wrappers (use the generic helper)
+function addCollarBlock() { addBlock({containerId: 'collarBlocks', blockSelector: '.collar-block', feedbackText: 'Added collar size'}); } 
 
-    const firstBlock = container.querySelector('.cuff-block');
-    if (!firstBlock) return;
+function addCuffBlock() { addBlock({containerId: 'cuffBlocks', blockSelector: '.cuff-block', feedbackText: 'Added cuff size'}); } 
 
-    const clone = firstBlock.cloneNode(true);
+function addButtonBlock() { addBlock({containerId: 'buttonBlocks', blockSelector: '.button-block', feedbackText: 'Added button item'}); } 
 
-    clone.querySelectorAll('input, select').forEach(el => {
-        if (el.tagName === 'SELECT') el.selectedIndex = 0;
-        else el.value = '';
+function addVelvetBlock() { addBlock({containerId: 'velvetBlocks', blockSelector: '.velvet-block', feedbackText: 'Added velvet tape'}); } 
+
+function addWashCareBlock() { addBlock({containerId: 'washCareBlocks', blockSelector: '.washcare-block', feedbackText: 'Added wash care label'}); } 
+
+function addWovenBlock() { addBlock({containerId: 'wovenBlocks', blockSelector: '.woven-block', feedbackText: 'Added woven label'}); } 
+
+function addFabricBlock() { addBlock({containerId: 'fabricBlocks', blockSelector: '.fabric-block', feedbackText: 'Added fabric'}); } 
+
+// removeBlock handler removed per user request
+
+function calculateMultipleFabrics() {
+    let total = 0;
+    document.querySelectorAll('.fabric-block').forEach(block => {
+        const amount = parseFloat(block.querySelector('.fabricAmount')?.value || 0);
+        const perGarment = parseFloat(block.querySelector('.fabricPerGarment')?.value || 0);
+        const qty = parseFloat(block.querySelector('.fabricQty')?.value || 0);
+        const hasAmount = Boolean(block.querySelector('.fabricAmount'));
+        const val = hasAmount ? (amount * perGarment * qty) : (perGarment * qty);
+        const totalField = block.querySelector('.fabricTotal');
+        if (totalField) {
+            totalField.dataset.inr = String(Number((val || 0).toFixed(6)));
+            totalField.value = formatQuantity(val);
+        }
+        total += val;
     });
-
-    container.appendChild(clone);
+    return total;
 }
-
 
     // Collect form data
     function collectFormData() {
@@ -416,6 +509,92 @@ if (data.cuffs.length === 0) {
     if (anyFilled) data.cuffs.push(singleCuff);
 }
 
+        // ===== COLLECT BUTTONS =====
+        data.buttons = [];
+        document.querySelectorAll('.button-block').forEach(block => {
+            const totalEl = block.querySelector('.buttonTotal');
+            const b = {
+                material: block.querySelector('.buttonMaterial')?.value || '',
+                amount: block.querySelector('.buttonAmount')?.value || '',
+                unit: block.querySelector('.buttonUnit')?.value || '',
+                perGarment: block.querySelector('.buttonPerGarment')?.value || '',
+                supplier: block.querySelector('.buttonSupplier')?.value || '',
+                qty: block.querySelector('.buttonQty')?.value || '',
+                total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+            };
+            const anyFilledBtn = [b.material, b.amount, b.unit, b.perGarment, b.supplier, b.qty, b.total].some(v => String(v).trim() !== '');
+            if (anyFilledBtn) data.buttons.push(b);
+        });
+
+        // ===== COLLECT VELVET TAPES =====
+        data.velvetTapes = [];
+        document.querySelectorAll('.velvet-block').forEach(block => {
+            const totalEl = block.querySelector('.velvetTapeTotal');
+            const v = {
+                quality: block.querySelector('.velvetTapeQuality')?.value || '',
+                meter: block.querySelector('.velvetTapeMeter')?.value || '',
+                unit: block.querySelector('.velvetTapeUnit')?.value || '',
+                perGarment: block.querySelector('.velvetTapePerGarment')?.value || '',
+                supplier: block.querySelector('.velvetTapeSupplier')?.value || '',
+                qty: block.querySelector('.velvetTapeQty')?.value || '',
+                total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+            };
+            const anyFilledVel = [v.quality, v.meter, v.unit, v.perGarment, v.supplier, v.qty, v.total].some(vv => String(vv).trim() !== '');
+            if (anyFilledVel) data.velvetTapes.push(v);
+        });
+
+        // ===== COLLECT WASH CARE LABELS =====
+        data.washCareLabels = [];
+        document.querySelectorAll('.washcare-block').forEach(block => {
+            const totalEl = block.querySelector('.washCareTotal');
+            const w = {
+                quality: block.querySelector('.washCareQuality')?.value || '',
+                amount: block.querySelector('.washCareAmount')?.value || '',
+                unit: block.querySelector('.washCareUnit')?.value || '',
+                perGarment: block.querySelector('.washCarePerGarment')?.value || '',
+                supplier: block.querySelector('.washCareSupplier')?.value || '',
+                qty: block.querySelector('.washCareQty')?.value || '',
+                total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+            };
+            const anyFilledWash = [w.quality, w.amount, w.unit, w.perGarment, w.supplier, w.qty, w.total].some(vv => String(vv).trim() !== '');
+            if (anyFilledWash) data.washCareLabels.push(w);
+        });
+
+        // ===== COLLECT WOVEN SIZE LABELS =====
+        data.wovenSizes = [];
+        document.querySelectorAll('.woven-block').forEach(block => {
+            const totalEl = block.querySelector('.wovenSizeTotal');
+            const s = {
+                size: block.querySelector('.wovenSizeLabel')?.value || '',
+                amount: block.querySelector('.wovenSizeAmount')?.value || '',
+                unit: block.querySelector('.wovenSizeUnit')?.value || '',
+                perGarment: block.querySelector('.wovenSizePerGarment')?.value || '',
+                supplier: block.querySelector('.wovenSizeSupplier')?.value || '',
+                qty: block.querySelector('.wovenSizeQty')?.value || '',
+                total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+            };
+            const anyFilledWoven = [s.size, s.amount, s.unit, s.perGarment, s.supplier, s.qty, s.total].some(vv => String(vv).trim() !== '');
+            if (anyFilledWoven) data.wovenSizes.push(s);
+        });
+
+        // ===== COLLECT FABRICS =====
+        data.fabrics = [];
+        document.querySelectorAll('.fabric-block').forEach(block => {
+            const totalEl = block.querySelector('.fabricTotal');
+            const f = {
+                type: block.querySelector('.fabricType')?.value || '',
+                color: block.querySelector('.fabricColor')?.value || '',
+                amount: block.querySelector('.fabricAmount')?.value || '',
+                unit: block.querySelector('.fabricUnit')?.value || '',
+                perGarment: block.querySelector('.fabricPerGarment')?.value || '',
+                supplier: block.querySelector('.fabricSupplier')?.value || '',
+                qty: block.querySelector('.fabricQty')?.value || '',
+                total: totalEl && totalEl.dataset && totalEl.dataset.inr ? parseFloat(totalEl.dataset.inr) : 0
+            };
+            const anyFilledFabric = [f.type, f.color, f.amount, f.unit, f.perGarment, f.supplier, f.qty, f.total].some(vv => String(vv).trim() !== '');
+            if (anyFilledFabric) data.fabrics.push(f);
+        });
+
         
         // Safe getter for optional inputs
         const getVal = (id) => {
@@ -428,10 +607,11 @@ if (data.cuffs.length === 0) {
         data.expectedDeliveryDate = getVal('expectedDeliveryDate');
         data.orderNumber = getVal('orderNumber');
         data.orderType = getVal('orderType');
-        data.currency = getVal('currency') || 'INR';
+        data.buyerName = getVal('buyerName') || '';
 
         // Fabric Section
         data.fabricType = getVal('fabricType');
+        data.fabricColor = getVal('fabricColor');
         data.fabricAmount = getVal('fabricAmount');
         data.fabricUnit = getVal('fabricUnit');
         data.fabricPerGarment = getVal('fabricPerGarment');
@@ -494,6 +674,15 @@ if (data.cuffs.length === 0) {
         data.polybagSupplier = getVal('polybagSupplier');
         data.polybagQty = getVal('polybagQty');
         
+        // Printing & Packaging fields
+        data.printing = getVal('printing');
+        data.embroidery = getVal('embroidery');
+        data.printFront = getVal('printFront') || '';
+        data.printBack = getVal('printBack') || '';
+        data.printSleeve = getVal('printSleeve') || '';
+        data.packing = getVal('packing') || getVal('packingDetails') || '';
+        data.tagRequired = getVal('tagRequired') || '';
+        
         // Add calculated totals (raw INR values read from data-inr when available)
         const getNumericTotal = (id) => {
             const el = document.getElementById(id);
@@ -503,15 +692,15 @@ if (data.cuffs.length === 0) {
             return isNaN(raw) ? 0 : raw;
         };
 
-        data.fabricTotal = getNumericTotal('fabricTotal');
+        data.fabricTotal = Array.isArray(data.fabrics) && data.fabrics.length > 0 ? data.fabrics.reduce((s,f)=>s + (parseFloat(f.total)||0), 0) : getNumericTotal('fabricTotal');
         data.collarYarnTotal = getNumericTotal('collarYarnTotal');
         data.tippingYarnTotal = getNumericTotal('tippingYarnTotal');
         data.collarTotal = getNumericTotal('collarTotal');
         data.cuffTotal = getNumericTotal('cuffTotal');
-        data.buttonTotal = getNumericTotal('buttonTotal');
-        data.velvetTapeTotal = getNumericTotal('velvetTapeTotal');
-        data.washCareTotal = getNumericTotal('washCareTotal');
-        data.wovenSizeTotal = getNumericTotal('wovenSizeTotal');
+        data.buttonTotal = Array.isArray(data.buttons) && data.buttons.length > 0 ? data.buttons.reduce((s,b)=>s + (parseFloat(b.total)||0), 0) : getNumericTotal('buttonTotal');
+        data.velvetTapeTotal = Array.isArray(data.velvetTapes) && data.velvetTapes.length > 0 ? data.velvetTapes.reduce((s,v)=>s + (parseFloat(v.total)||0), 0) : getNumericTotal('velvetTapeTotal');
+        data.washCareTotal = Array.isArray(data.washCareLabels) && data.washCareLabels.length > 0 ? data.washCareLabels.reduce((s,w)=>s + (parseFloat(w.total)||0), 0) : getNumericTotal('washCareTotal');
+        data.wovenSizeTotal = Array.isArray(data.wovenSizes) && data.wovenSizes.length > 0 ? data.wovenSizes.reduce((s,siz)=>s + (parseFloat(siz.total)||0), 0) : getNumericTotal('wovenSizeTotal');
         data.polybagTotal = getNumericTotal('polybagTotal');
         data.grandTotal = calculateAllTotals();
         
@@ -611,21 +800,36 @@ if (data.cuffs.length === 0) {
     // Create CSV content
     function createCSVContent(data) {
                 const rows = [];
-                rows.push(['Twinklub BOM - Bill of Materials']);
+                rows.push(['Moonland Bill Of materials']);
                 rows.push(['']);
         rows.push(['Order Number:', data.orderNumber || '']);
         rows.push(['Order Type:', data.orderType || '']);
+        rows.push(['Buyer Name:', data.buyerName || '']);
                 rows.push(['']);
-        rows.push(['Section', 'Details', 'Amount', 'Unit', 'Per Garment', 'Supplier', 'Q.QTY', 'Total']);
-        rows.push(['Fabric 1', data.fabricType || '', data.fabricAmount || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', formatCurrency(data.fabricTotal || 0)]);
-        rows.push(['Collar Yarn', data.collarYarnType || '', data.collarYarnAmount || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', formatCurrency(data.collarYarnTotal || 0)]);
-        rows.push(['Tipping Yarn', data.tippingYarnType || '', data.tippingYarnAmount || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', formatCurrency(data.tippingYarnTotal || 0)]);
+        rows.push(['Printing:', data.printing || '']);
+        rows.push(['Embroidery:', data.embroidery || '']);
+        rows.push(['Printing Locations:', `Front:${data.printFront}, Back:${data.printBack}, Sleeve:${data.printSleeve}`]);
+        rows.push(['Packing:', data.packing || '']);
+        rows.push(['Tag Required:', data.tagRequired || '']);
+        rows.push(['']);
+        rows.push(['Section', 'Details', 'Quantity', 'Unit', 'Per Garment', 'Supplier', 'Q.QTY', 'Total Qty']);
+        if (Array.isArray(data.fabrics) && data.fabrics.length > 0) {
+            data.fabrics.forEach((f, idx) => {
+                const details = `${f.type || ''}${f.color ? ' | Color: ' + f.color : ''}`;
+                rows.push([`Fabric-${idx + 1}`, details, f.amount || '', f.unit || '', f.perGarment || '', f.supplier || '', f.qty || '', formatQuantity(f.total || 0)]);
+            });
+        } else {
+            const details = `${data.fabricType || ''}${data.fabricColor ? ' | Color: ' + data.fabricColor : ''}`;
+            rows.push(['Fabric 1', details, data.fabricAmount || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', formatQuantity(data.fabricTotal || 0)]);
+        }
+        rows.push(['Collar Yarn', data.collarYarnType || '', data.collarYarnAmount || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', formatQuantity(data.collarYarnTotal || 0)]);
+        rows.push(['Tipping Yarn', data.tippingYarnType || '', data.tippingYarnAmount || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', formatQuantity(data.tippingYarnTotal || 0)]);
 
         // Add collar measurements (multiple) with numbering
         if (Array.isArray(data.collars) && data.collars.length > 0) {
             data.collars.forEach((c, idx) => {
                 const details = `${c.size || ''}${c.dimensions ? ' - ' + c.dimensions : ''}`;
-                rows.push([`Collar Measurements-${idx + 1}`, details, '', c.unit || '', c.perGarment || '', c.supplier || '', c.qty || '', formatCurrency(c.total || 0)]);
+                rows.push([`Collar Measurements-${idx + 1}`, details, '', c.unit || '', c.perGarment || '', c.supplier || '', c.qty || '', formatQuantity(c.total || 0)]);
             });
         }
 
@@ -633,17 +837,42 @@ if (data.cuffs.length === 0) {
         if (Array.isArray(data.cuffs) && data.cuffs.length > 0) {
             data.cuffs.forEach((c, idx) => {
                 const details = `${c.size || ''}${c.dimensions ? ' - ' + c.dimensions : ''}`;
-                rows.push([`Cuff Measurements-${idx + 1}`, details, '', c.unit || '', c.perGarment || '', c.supplier || '', c.qty || '', formatCurrency(c.total || 0)]);
+                rows.push([`Cuff Measurements-${idx + 1}`, details, '', c.unit || '', c.perGarment || '', c.supplier || '', c.qty || '', formatQuantity(c.total || 0)]);
             });
         }
         
-        rows.push(['Buttons', data.buttonMaterial || '', data.buttonAmount || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', formatCurrency(data.buttonTotal || 0)]);
-        rows.push(['Velvet Tapes', data.velvetTapeQuality || '', data.velvetTapeMeter || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', formatCurrency(data.velvetTapeTotal || 0)]);
-        rows.push(['Wash Care Labels', data.washCareQuality || '', data.washCareAmount || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', formatCurrency(data.washCareTotal || 0)]);
-        rows.push(['Polybags', data.polybagQuality || '', data.polybagSize || '', data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', formatCurrency(data.polybagTotal || 0)]);
+        // Buttons (multiple)
+        if (Array.isArray(data.buttons) && data.buttons.length > 0) {
+            data.buttons.forEach((b, idx) => {
+                rows.push([`Buttons-${idx + 1}`, b.material || '', b.amount || '', b.unit || '', b.perGarment || '', b.supplier || '', b.qty || '', formatQuantity(b.total || 0)]);
+            });
+        } else {
+            rows.push(['Buttons', data.buttonMaterial || '', data.buttonAmount || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', formatQuantity(data.buttonTotal || 0)]);
+        }
+
+        // Velvet Tapes (multiple)
+        if (Array.isArray(data.velvetTapes) && data.velvetTapes.length > 0) {
+            data.velvetTapes.forEach((v, idx) => {
+                rows.push([`Velvet Tape-${idx + 1}`, v.quality || '', v.meter || '', v.unit || '', v.perGarment || '', v.supplier || '', v.qty || '', formatQuantity(v.total || 0)]);
+            });
+        } else {
+            rows.push(['Velvet Tapes', data.velvetTapeQuality || '', data.velvetTapeMeter || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', formatQuantity(data.velvetTapeTotal || 0)]);
+        }
+
+        // Wash Care Labels (multiple)
+        if (Array.isArray(data.washCareLabels) && data.washCareLabels.length > 0) {
+            data.washCareLabels.forEach((w, idx) => {
+                rows.push([`Wash Care-${idx + 1}`, w.quality || '', w.amount || '', w.unit || '', w.perGarment || '', w.supplier || '', w.qty || '', formatQuantity(w.total || 0)]);
+            });
+        } else {
+            rows.push(['Wash Care Labels', data.washCareQuality || '', data.washCareAmount || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', formatQuantity(data.washCareTotal || 0)]);
+        }
+
+        // Polybags
+        rows.push(['Polybags', data.polybagQuality || '', data.polybagSize || '', data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', formatQuantity(data.polybagTotal || 0)]);
         rows.push(['']);
-        // Ensure grand total uses current currency symbol
-        rows.push(['GRAND TOTAL:', formatCurrency(parseFloat(String(data.grandTotal).replace(/[^0-9.]/g, '')) || calculateAllTotals())]);
+        // Ensure grand total shows total quantity
+        rows.push(['GRAND TOTAL (Qty):', formatQuantity(parseFloat(String(data.grandTotal).replace(/[^0-9.]/g, '')) || calculateAllTotals())]);
         
         return rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
     }
@@ -668,76 +897,68 @@ if (data.cuffs.length === 0) {
     // Create text content
     function createTextContent(data) {
         return `
-    TWINKLUB BOM - BILL OF MATERIALS
+    MOONLAND BOM - BILL OF MATERIALS
     ================================
 
     Order Information:
     ------------------
     Order Number: ${data.orderNumber || ''}
     Order Type: ${data.orderType || ''}
+    Buyer Name: ${data.buyerName || ''}
+    Printing: ${data.printing || ''}
+    Embroidery: ${data.embroidery || ''}
+    Printing Locations: Front:${data.printFront}, Back:${data.printBack}, Sleeve:${data.printSleeve}
+    Packing: ${data.packing || ''}
+    Tag Required: ${data.tagRequired || ''}
 
     BOM Data:
     ---------
-    Fabric 1: ${data.fabricType || ''}
-    Amount: ${data.fabricAmount || ''} ${data.fabricUnit || ''}
-    Per Garment: ${data.fabricPerGarment || ''}
-    Supplier: ${data.fabricSupplier || ''}
-    Q.QTY: ${data.fabricQty || ''}
-    Total: ${formatCurrency(data.fabricTotal || 0)}
+    ${Array.isArray(data.fabrics) && data.fabrics.length > 0 ? data.fabrics.map((f,i) => `Fabric-${i+1}: ${f.type || ''}${f.color ? ' | Color: ' + f.color : ''}\n    Quantity: ${f.amount || ''} ${f.unit || ''}\n    Per Garment: ${f.perGarment || ''}\n    Supplier: ${f.supplier || ''}\n    Q.QTY: ${f.qty || ''}\n    Total Qty: ${formatQuantity(f.total || 0)}`).join('\n\n    ') : `Fabric 1: ${data.fabricType || ''}${data.fabricColor ? ' | Color: ' + data.fabricColor : ''}\n    Quantity: ${data.fabricAmount || ''} ${data.fabricUnit || ''}\n    Per Garment: ${data.fabricPerGarment || ''}\n    Supplier: ${data.fabricSupplier || ''}\n    Q.QTY: ${data.fabricQty || ''}\n    Total Qty: ${formatQuantity(data.fabricTotal || 0)}` }
 
     Collar Yarn: ${data.collarYarnType || ''}
-    Amount: ${data.collarYarnAmount || ''} ${data.collarYarnUnit || ''}
+    Quantity: ${data.collarYarnAmount || ''} ${data.collarYarnUnit || ''}
     Per Garment: ${data.collarYarnPerGarment || ''}
     Supplier: ${data.collarYarnSupplier || ''}
     Q.QTY: ${data.collarYarnQty || ''}
-    Total: ${formatCurrency(data.collarYarnTotal || 0)}
+    Total Qty: ${formatQuantity(data.collarYarnTotal || 0)}
 
     Tipping Yarn: ${data.tippingYarnType || ''}
-    Amount: ${data.tippingYarnAmount || ''} ${data.tippingYarnUnit || ''}
+    Quantity: ${data.tippingYarnAmount || ''} ${data.tippingYarnUnit || ''}
     Per Garment: ${data.tippingYarnPerGarment || ''}
     Supplier: ${data.tippingYarnSupplier || ''}
     Q.QTY: ${data.tippingYarnQty || ''}
-    Total: ${formatCurrency(data.tippingYarnTotal || 0)}
+    Total Qty: ${formatQuantity(data.tippingYarnTotal || 0)}
 
-    Buttons: ${data.buttonMaterial || ''}
-    Amount: ${data.buttonAmount || ''} ${data.buttonUnit || ''}
-    Per Garment: ${data.buttonPerGarment || ''}
-    Supplier: ${data.buttonSupplier || ''}
-    Q.QTY: ${data.buttonQty || ''}
-    Total: ${formatCurrency(data.buttonTotal || 0)}
+    Buttons:
+    ${Array.isArray(data.buttons) && data.buttons.length > 0 ? data.buttons.map((b,i) => `Buttons-${i+1}: Material: ${b.material || ''} | Quantity: ${b.amount || ''} ${b.unit || ''} | Per Garment: ${b.perGarment || ''} | Supplier: ${b.supplier || ''} | Q.QTY: ${b.qty || ''} | Total Qty: ${formatQuantity(b.total || 0)}`).join('\n    ') : `Buttons: ${data.buttonMaterial || ''}\n    Quantity: ${data.buttonAmount || ''} ${data.buttonUnit || ''}\n    Per Garment: ${data.buttonPerGarment || ''}\n    Supplier: ${data.buttonSupplier || ''}\n    Q.QTY: ${data.buttonQty || ''}\n    Total Qty: ${formatQuantity(data.buttonTotal || 0)}` }
 
-    Velvet Tapes: ${data.velvetTapeQuality || ''}
-    Amount: ${data.velvetTapeMeter || ''} ${data.velvetTapeUnit || ''}
-    Per Garment: ${data.velvetTapePerGarment || ''}
-    Supplier: ${data.velvetTapeSupplier || ''}
-    Q.QTY: ${data.velvetTapeQty || ''}
-    Total: ${formatCurrency(data.velvetTapeTotal || 0)}
+    Velvet Tapes:
+    ${Array.isArray(data.velvetTapes) && data.velvetTapes.length > 0 ? data.velvetTapes.map((v,i) => `Velvet Tape-${i+1}: ${v.quality || ''} | Quantity: ${v.meter || ''} ${v.unit || ''} | Per Garment: ${v.perGarment || ''} | Supplier: ${v.supplier || ''} | Q.QTY: ${v.qty || ''} | Total Qty: ${formatQuantity(v.total || 0)}`).join('\n    ') : `Velvet Tapes: ${data.velvetTapeQuality || ''}\n    Quantity: ${data.velvetTapeMeter || ''} ${data.velvetTapeUnit || ''}\n    Per Garment: ${data.velvetTapePerGarment || ''}\n    Supplier: ${data.velvetTapeSupplier || ''}\n    Q.QTY: ${data.velvetTapeQty || ''}\n    Total Qty: ${formatQuantity(data.velvetTapeTotal || 0)}` }
 
-    Wash Care Labels: ${data.washCareQuality || ''}
-    Amount: ${data.washCareAmount || ''} ${data.washCareUnit || ''}
-    Per Garment: ${data.washCarePerGarment || ''}
-    Supplier: ${data.washCareSupplier || ''}
-    Q.QTY: ${data.washCareQty || ''}
-    Total: ${formatCurrency(data.washCareTotal || 0)}
+    Wash Care:
+    ${Array.isArray(data.washCareLabels) && data.washCareLabels.length > 0 ? data.washCareLabels.map((w,i) => `Wash Care-${i+1}: ${w.quality || ''} | Quantity: ${w.amount || ''} ${w.unit || ''} | Per Garment: ${w.perGarment || ''} | Supplier: ${w.supplier || ''} | Q.QTY: ${w.qty || ''} | Total Qty: ${formatQuantity(w.total || 0)}`).join('\n    ') : `Wash Care Labels: ${data.washCareQuality || ''}\n    Quantity: ${data.washCareAmount || ''} ${data.washCareUnit || ''}\n    Per Garment: ${data.washCarePerGarment || ''}\n    Supplier: ${data.washCareSupplier || ''}\n    Q.QTY: ${data.washCareQty || ''}\n    Total Qty: ${formatQuantity(data.washCareTotal || 0)}` }
+
+    Woven Size Labels:
+    ${Array.isArray(data.wovenSizes) && data.wovenSizes.length > 0 ? data.wovenSizes.map((s,i) => `Woven-${i+1}: Size: ${s.size || ''} | Quantity: ${s.amount || ''} ${s.unit || ''} | Per Garment: ${s.perGarment || ''} | Supplier: ${s.supplier || ''} | Q.QTY: ${s.qty || ''} | Total Qty: ${formatQuantity(s.total || 0)}`).join('\n    ') : `Woven Size Labels: ${data.wovenSizeLabel || ''}\n    Quantity: ${data.wovenSizeAmount || ''} ${data.wovenSizeUnit || ''}\n    Per Garment: ${data.wovenSizePerGarment || ''}\n    Supplier: ${data.wovenSizeSupplier || ''}\n    Q.QTY: ${data.wovenSizeQty || ''}\n    Total Qty: ${formatQuantity(data.wovenSizeTotal || 0)}` }
 
     Polybags: ${data.polybagQuality || ''}
     Size: ${data.polybagSize || ''} ${data.polybagUnit || ''}
     Per Garment: ${data.polybagPerGarment || ''}
     Supplier: ${data.polybagSupplier || ''}
     Q.QTY: ${data.polybagQty || ''}
-    Total: ${formatCurrency(data.polybagTotal || 0)}
+    Total Qty: ${formatQuantity(data.polybagTotal || 0)}
 
     ================================
     COLLAR MEASUREMENTS:
     ---------------------
-    ${Array.isArray(data.collars) && data.collars.length > 0 ? data.collars.map((c, i) => `Collar MSMTS-${i + 1}: Size: ${c.size || ''} | Dim: ${c.dimensions || ''} | Unit: ${c.unit || ''} | Per Garment: ${c.perGarment || ''} | Supplier: ${c.supplier || ''} | Q.QTY: ${c.qty || ''} | Total: ${formatCurrency(c.total || 0)}`).join('\n    ') : 'None'}
+    ${Array.isArray(data.collars) && data.collars.length > 0 ? data.collars.map((c, i) => `Collar MSMTS-${i + 1}: Size: ${c.size || ''} | Dim: ${c.dimensions || ''} | Unit: ${c.unit || ''} | Per Garment: ${c.perGarment || ''} | Supplier: ${c.supplier || ''} | Q.QTY: ${c.qty || ''} | Total Qty: ${formatQuantity(c.total || 0)}`).join('\n    ') : 'None'}
 
     CUFF MEASUREMENTS:
     -------------------
-    ${Array.isArray(data.cuffs) && data.cuffs.length > 0 ? data.cuffs.map((c, i) => `Cuff MSMTS-${i + 1}: Size: ${c.size || ''} | Dim: ${c.dimensions || ''} | Unit: ${c.unit || ''} | Per Garment: ${c.perGarment || ''} | Supplier: ${c.supplier || ''} | Q.QTY: ${c.qty || ''} | Total: ${formatCurrency(c.total || 0)}`).join('\n    ') : 'None'}
+    ${Array.isArray(data.cuffs) && data.cuffs.length > 0 ? data.cuffs.map((c, i) => `Cuff MSMTS-${i + 1}: Size: ${c.size || ''} | Dim: ${c.dimensions || ''} | Unit: ${c.unit || ''} | Per Garment: ${c.perGarment || ''} | Supplier: ${c.supplier || ''} | Q.QTY: ${c.qty || ''} | Total Qty: ${formatQuantity(c.total || 0)}`).join('\n    ') : 'None'}
 
     ================================
-    GRAND TOTAL: ${formatCurrency(parseFloat(String(data.grandTotal).replace(/[^0-9.]/g, '')) || calculateAllTotals())}
+    GRAND TOTAL (Qty): ${formatQuantity(parseFloat(String(data.grandTotal).replace(/[^0-9.]/g, '')) || calculateAllTotals())}
     ================================
         `;
     }
@@ -753,14 +974,24 @@ if (data.cuffs.length === 0) {
             calculateAllTotals();
 
             const data = collectFormData();
+            // Log counts for duplicated sections to help debug exports
             console.log('Form data collected:', data);
+            console.log('Duplicate counts:', {
+                fabrics: Array.isArray(data.fabrics) ? data.fabrics.length : 0,
+                buttons: Array.isArray(data.buttons) ? data.buttons.length : 0,
+                velvetTapes: Array.isArray(data.velvetTapes) ? data.velvetTapes.length : 0,
+                washCare: Array.isArray(data.washCareLabels) ? data.washCareLabels.length : 0,
+                wovenSizes: Array.isArray(data.wovenSizes) ? data.wovenSizes.length : 0,
+                collars: Array.isArray(data.collars) ? data.collars.length : 0,
+                cuffs: Array.isArray(data.cuffs) ? data.cuffs.length : 0
+            });
             
             // Check if XLSX is available
             if (typeof XLSX === 'undefined' || !XLSX.utils || !XLSX.writeFile) {
                 console.warn('XLSX not available, using CSV fallback');
                 // Create simple CSV export
                 const csvContent = createCSVContent(data);
-                downloadFile(csvContent, 'csv', 'Twinklub_BOM_Export.csv');
+                downloadFile(csvContent, 'csv', 'Moonland_BOM_Export.csv');
                 hideLoadingOverlay();
                 showAnimatedPopup('CSV file exported successfully!', 'success');
                 return;
@@ -770,23 +1001,47 @@ if (data.cuffs.length === 0) {
             
             // Create worksheet data. Only include selected sizes when corresponding QTY > 0.
             const worksheetData = [
-                ['Twinklub BOM - Bill of Materials'],
+                ['Moonland Bill Of materials'],
                 [''],
                 ['Garment Type:', data.orderType || ''],
                 ['Order Number:', data.orderNumber || ''],
                 ['Order Date:', data.orderDate || ''],
                 ['Expected Delivery Date:', data.expectedDeliveryDate || ''],
-                ['Currency:', data.currency || 'INR'],
+                ['Buyer Name:', data.buyerName || ''],
+                ['Printing:', data.printing || ''],
+                ['Embroidery:', data.embroidery || ''],
+                ['Printing Locations:', `Front:${data.printFront}, Back:${data.printBack}, Sleeve:${data.printSleeve}`],
+                ['Packing:', data.packing || ''],
+                ['Tag Required:', data.tagRequired || ''],
 
                 [''],
-                ['QUALITY', 'DETAILS', 'UNIT OF MSMTS', 'PER GARMENT', 'SUPPLIER', 'O.QTY', 'TOTAL AMOUNT'],
+                ['QUALITY', 'DETAILS', 'UNIT OF MSMTS', 'PER GARMENT', 'SUPPLIER', 'O.QTY', 'QTY'],
                 [''],
                 // Each row below must have exactly 7 columns to match the header
-                ['FABRIC', data.fabricType || '', data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', formatCurrency(data.fabricTotal || 0)],
+                ...(data.fabrics || []).flatMap((f, index) => [
+                    [
+                        `FABRIC-${index + 1}`,
+                        `${f.type || ''}${f.color ? ' | Color: ' + f.color : ''}`,
+                        f.unit || '',
+                        f.perGarment || '',
+                        f.supplier || '',
+                        f.qty || '',
+                        formatQuantity(f.total)
+                    ],
+                    ['']
+                ]),
+                ...((() => {
+                    if (!Array.isArray(data.fabrics) || data.fabrics.length === 0) {
+                        const q = parseFloat(data.fabricQty || '');
+                        if (!isNaN(q) && q > 0) {
+                            return [['FABRIC', `${data.fabricType || ''}${data.fabricColor ? ' | Color: ' + data.fabricColor : ''}`, data.fabricUnit || '', data.fabricPerGarment || '', data.fabricSupplier || '', data.fabricQty || '', formatQuantity(data.fabricTotal || 0)], ['']];
+                        }
+                    }
+                    return [];
+                })()),
+                ['COLLAR YARN', data.collarYarnType || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', formatQuantity(data.collarYarnTotal || 0)],
                 [''],
-                ['COLLAR YARN', data.collarYarnType || '', data.collarYarnUnit || '', data.collarYarnPerGarment || '', data.collarYarnSupplier || '', data.collarYarnQty || '', formatCurrency(data.collarYarnTotal || 0)],
-                [''],
-                ['TIPPING YARN', data.tippingYarnType || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', formatCurrency(data.tippingYarnTotal || 0)],
+                ['TIPPING YARN', data.tippingYarnType || '', data.tippingYarnUnit || '', data.tippingYarnPerGarment || '', data.tippingYarnSupplier || '', data.tippingYarnQty || '', formatQuantity(data.tippingYarnTotal || 0)],
                 [''],
                 // Collar measurements - only show if quantity > 0
                 // ===== MULTIPLE COLLAR ROWS =====
@@ -798,7 +1053,7 @@ if (data.cuffs.length === 0) {
         c.perGarment,
         c.supplier,
         c.qty,
-        formatCurrency(c.total)
+        formatQuantity(c.total)
     ],
     ['']
 ]),
@@ -812,27 +1067,92 @@ if (data.cuffs.length === 0) {
         c.perGarment,
         c.supplier,
         c.qty,
-        formatCurrency(c.total)
+        formatQuantity(c.total)
     ],
     ['']
 ]),
-                ['BUTTONS', data.buttonMaterial || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', formatCurrency(data.buttonTotal || 0)],
-                [''],
-                ['VELVET TAPES', data.velvetTapeQuality || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', formatCurrency(data.velvetTapeTotal || 0)],
-                [''],
-                ['WASH CARE LABELS', data.washCareQuality || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', formatCurrency(data.washCareTotal || 0)],
-                [''],
-                // Woven size labels - only show if quantity > 0
+...(data.buttons || []).flatMap((b, index) => [
+    [
+        `BUTTONS-${index + 1}`,
+        b.material || '',
+        b.unit || '',
+        b.perGarment || '',
+        b.supplier || '',
+        b.qty || '',
+        formatQuantity(b.total)
+    ],
+    ['']
+]),
+// fallback single button row if no dynamic buttons
+...((() => {
+    if (!Array.isArray(data.buttons) || data.buttons.length === 0) {
+        return [['BUTTONS', data.buttonMaterial || '', data.buttonUnit || '', data.buttonPerGarment || '', data.buttonSupplier || '', data.buttonQty || '', formatQuantity(data.buttonTotal || 0)], ['']];
+    }
+    return [];
+})()),
+
+...(data.velvetTapes || []).flatMap((v, index) => [
+    [
+        `VELVET TAPE-${index + 1}`,
+        v.quality || '',
+        v.unit || '',
+        v.perGarment || '',
+        v.supplier || '',
+        v.qty || '',
+        formatQuantity(v.total)
+    ],
+    ['']
+]),
+...((() => {
+    if (!Array.isArray(data.velvetTapes) || data.velvetTapes.length === 0) {
+        return [['VELVET TAPES', data.velvetTapeQuality || '', data.velvetTapeUnit || '', data.velvetTapePerGarment || '', data.velvetTapeSupplier || '', data.velvetTapeQty || '', formatQuantity(data.velvetTapeTotal || 0)], ['']];
+    }
+    return [];
+})()),
+
+...(data.washCareLabels || []).flatMap((w, index) => [
+    [
+        `WASH CARE-${index + 1}`,
+        w.quality || '',
+        w.unit || '',
+        w.perGarment || '',
+        w.supplier || '',
+        w.qty || '',
+        formatQuantity(w.total)
+    ],
+    ['']
+]),
+...((() => {
+    if (!Array.isArray(data.washCareLabels) || data.washCareLabels.length === 0) {
+        return [['WASH CARE LABELS', data.washCareQuality || '', data.washCareUnit || '', data.washCarePerGarment || '', data.washCareSupplier || '', data.washCareQty || '', formatQuantity(data.washCareTotal || 0)], ['']];
+    }
+    return [];
+})()),
+                // Woven size labels (multiple)
+                ...(data.wovenSizes || []).flatMap((s, index) => [
+                    [
+                        `SIZE LABELS-${index + 1}`,
+                        `WVN SIZE LBL - ${s.size || ''}`,
+                        s.unit || '',
+                        s.perGarment || '',
+                        s.supplier || '',
+                        s.qty || '',
+                        formatQuantity(s.total)
+                    ],
+                    ['']
+                ]),
                 ...((() => {
-                    const q = parseFloat(data.wovenSizeQty || '');
-                    if (!isNaN(q) && q > 0) {
-                        return [['SIZE LABELS (WVN SIZE LBL)', `WVN SIZE LBL - ${data.wovenSizeLabel || ''}`, data.wovenSizeUnit || '', data.wovenSizePerGarment || '', data.wovenSizeSupplier || '', data.wovenSizeQty || '', formatCurrency(data.wovenSizeTotal || 0)], ['']];
+                    if (!Array.isArray(data.wovenSizes) || data.wovenSizes.length === 0) {
+                        const q = parseFloat(data.wovenSizeQty || '');
+                        if (!isNaN(q) && q > 0) {
+                            return [['SIZE LABELS (WVN SIZE LBL)', `WVN SIZE LBL - ${data.wovenSizeLabel || ''}`, data.wovenSizeUnit || '', data.wovenSizePerGarment || '', data.wovenSizeSupplier || '', data.wovenSizeQty || '', formatQuantity(data.wovenSizeTotal || 0)], ['']];
+                        }
                     }
                     return [];
                 })()),
-                ['POLYBAGS', (data.polybagQuality || '') + (data.polybagSize ? ` - ${data.polybagSize}` : ''), data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', formatCurrency(data.polybagTotal || 0)],
+                ['POLYBAGS', (data.polybagQuality || '') + (data.polybagSize ? ` - ${data.polybagSize}` : ''), data.polybagUnit || '', data.polybagPerGarment || '', data.polybagSupplier || '', data.polybagQty || '', formatQuantity(data.polybagTotal || 0)],
                 [''],
-               ['GRAND TOTAL:', formatCurrency(calculateAllTotals())]
+               ['GRAND TOTAL (Qty):', formatQuantity(calculateAllTotals())]
 
             ];
             
@@ -848,7 +1168,7 @@ if (data.cuffs.length === 0) {
             
             // Generate filename
             const orderNumber = data.orderNumber || 'BOM';
-            const filename = `Twinklub_BOM_${orderNumber}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            const filename = `Moonland_BOM_${orderNumber}_${new Date().toISOString().split('T')[0]}.xlsx`; 
             
             // Simulate processing time for better UX
             setTimeout(() => {
@@ -886,7 +1206,23 @@ if (data.cuffs.length === 0) {
                 const field = document.getElementById(fieldId);
                 if (field && field.dataset) field.dataset.inr = '';
             });
-            document.getElementById('grandTotal').textContent = formatCurrency(0);
+
+            // Clear dynamic totals for duplicated blocks
+            document.querySelectorAll('.buttonTotal, .velvetTapeTotal, .washCareTotal, .wovenSizeTotal, .fabricTotal, .collarTotal, .cuffTotal, .polybagTotal').forEach(el => {
+                if (el) el.value = '';
+                if (el && el.dataset) el.dataset.inr = '';
+            });
+
+            // Clear printing checkboxes and buyer
+            const checkIds = ['printFront','printBack','printSleeve'];
+            checkIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.type === 'checkbox') el.checked = false;
+            });
+            const buyerEl = document.getElementById('buyerName');
+            if (buyerEl) buyerEl.value = '';
+
+            document.getElementById('grandTotal').textContent = formatQuantity(0);
 
             
             // No default values to reset - form will be completely empty
